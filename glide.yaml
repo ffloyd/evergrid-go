@@ -1,0 +1,5 @@
+package: github.com/ffloyd/evergrid-go
+import:
+- package: github.com/Sirupsen/logrus
+- package: github.com/spf13/cobra
+- package: github.com/spf13/viper
