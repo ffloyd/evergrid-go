@@ -2,8 +2,11 @@ package simulation
 
 import (
 	"github.com/ffloyd/evergrid-go/simulation/agent"
+	"github.com/ffloyd/evergrid-go/simulation/loader"
 	"github.com/ffloyd/evergrid-go/simulation/network"
 	"github.com/ffloyd/evergrid-go/simulation/ticker"
+
+	log "github.com/Sirupsen/logrus"
 )
 
 // Simulation represents whole simulation environment
@@ -15,6 +18,9 @@ type Simulation struct {
 
 // New generates new simulation environment
 func New() *Simulation {
+	infrastructure := loader.LoadInfrastructure("simdata/infrastructure/small.json")
+	log.Info(infrastructure)
+
 	se := new(Simulation)
 
 	se.agents = []agent.Runner{

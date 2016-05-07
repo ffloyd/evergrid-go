@@ -1,23 +1,18 @@
 {
-  "network": {
-    "name": "Small network",
-    "segments": [
-      {
-        "name": "Segment 1",
-        "bandwith": [100, 100],
-        "nodes": [
-          {
-            "name": "Worker 1",
-            "bandwith": [100, 100],
-            "agents": [
-              {
-                "type": "Dummy",
-                "name": "Dummy 1"
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  }
+    "name": "Small infrastucture",
+    "network": {
+        "name": "Small network",
+        "segments": [{
+            "name": "Segment 1",
+            "nodes": [{
+                "name": "Node 1",
+                "agents": [{
+                    "name": "Dummy 1",
+                    "type": "dummy"
+                }]
+            }]
+        }, {
+            "name": "Segment 2"
+        }]
+    }
 }
