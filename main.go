@@ -2,12 +2,12 @@ package main
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simenv"
+	"github.com/ffloyd/evergrid-go/simulation"
 )
 
 func main() {
 	log.SetLevel(log.DebugLevel)
 
-	simulation := simenv.New()
-	simulation.Run()
+	sim := simulation.New()
+	sim.Run()
 }

@@ -2,7 +2,7 @@ package ticker
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simenv/agent"
+	"github.com/ffloyd/evergrid-go/simulation/agent"
 )
 
 // Ticker is a global timer like NetLogo's one

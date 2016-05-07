@@ -1,21 +1,21 @@
-package simenv
+package simulation
 
 import (
-	"github.com/ffloyd/evergrid-go/simenv/agent"
-	"github.com/ffloyd/evergrid-go/simenv/network"
-	"github.com/ffloyd/evergrid-go/simenv/ticker"
+	"github.com/ffloyd/evergrid-go/simulation/agent"
+	"github.com/ffloyd/evergrid-go/simulation/network"
+	"github.com/ffloyd/evergrid-go/simulation/ticker"
 )
 
-// Simenv represents whole simulation environment
-type Simenv struct {
+// Simulation represents whole simulation environment
+type Simulation struct {
 	ticker  *ticker.Ticker
 	network *network.Network
 	agents  []agent.Runner
 }
 
 // New generates new simulation environment
-func New() *Simenv {
-	se := new(Simenv)
+func New() *Simulation {
+	se := new(Simulation)
 
 	se.agents = []agent.Runner{
 		agent.NewDummy("Dummy 1"),
@@ -30,6 +30,6 @@ func New() *Simenv {
 }
 
 // Run starts simulation
-func (se Simenv) Run() {
+func (se Simulation) Run() {
 	se.ticker.Run()
 }
