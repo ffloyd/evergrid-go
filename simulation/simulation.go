@@ -19,8 +19,8 @@ type Simulation struct {
 }
 
 // New generates new simulation environment
-func New() *Simulation {
-	infrastructure := loader.LoadInfrastructure("simdata/infrastructure/small.json")
+func New(infraFilename string) *Simulation {
+	infrastructure := loader.LoadInfrastructure(infraFilename)
 
 	sim := &Simulation{
 		infrastructureName: infrastructure.Name,
