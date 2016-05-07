@@ -16,17 +16,15 @@ type Simenv struct {
 // New generates new simulation environment
 func New() *Simenv {
 	se := new(Simenv)
-	se.ticker = ticker.New()
-	se.network = network.New()
 
 	se.agents = []agent.Runner{
-		agent.NewDummy("Agent 1"),
-		agent.NewDummy("Agent 2"),
+		agent.NewDummy("Dummy 1"),
+		agent.NewDummy("Dummy 2"),
 	}
 
-	for _, ag := range se.agents {
-		se.ticker.AddAgent(ag)
-	}
+	se.network = network.New()
+
+	se.ticker = ticker.New(se.agents) // ticker initialization starts all agents
 
 	return se
 }

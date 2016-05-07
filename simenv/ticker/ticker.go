@@ -8,32 +8,35 @@ import (
 // Ticker is a global timer like NetLogo's one
 type Ticker struct {
 	currentTick int
-	agents      []*agent.Chans
+	agentChans  []*agent.Chans
 }
 
-// New creates a new Ticker
-func New() *Ticker {
+// New creates a new Ticker. Also it runs all agents because it essential for correct work of ticker.
+func New(agents []agent.Runner) *Ticker {
 	defer log.Info("New ticker initialized")
-	return &Ticker{}
+
+	ticker := new(Ticker)
+
+	ticker.agentChans = make([]*agent.Chans, len(agents))
+	for i, agent := range agents {
+		ticker.agentChans[i] = agent.Run()
+	}
+
+	return ticker
 }
 
-// AddAgent adds an agent to watch
-func (ticker *Ticker) AddAgent(newAgent agent.Runner) {
-	ticker.agents = append(ticker.agents, newAgent.Run())
-}
-
-// Run simulation
+// Run starts ticker
 func (ticker *Ticker) Run() {
 	for {
 		// send new tick to all agents
 		ticker.currentTick++
 		log.WithField("tick", ticker.currentTick).Debug("new tick")
-		for _, chans := range ticker.agents {
+		for _, chans := range ticker.agentChans {
 			chans.Ticks <- ticker.currentTick
 		}
 
 		// wait for ready status from all agents
-		for _, chans := range ticker.agents {
+		for _, chans := range ticker.agentChans {
 			_ = <-chans.Ready
 		}
 	}
