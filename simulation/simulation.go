@@ -11,6 +11,8 @@ import (
 
 // Simulation represents whole simulation environment
 type Simulation struct {
+	infrastructureName string
+
 	ticker  *ticker.Ticker
 	network *network.Network
 	agents  []agent.Runner
@@ -18,10 +20,10 @@ type Simulation struct {
 
 // New generates new simulation environment
 func New() *Simulation {
-	infrastructure := loader.LoadInfrastructure("simdata/infrastructure/small.json")
-	log.Info(infrastructure)
-
 	se := new(Simulation)
+
+	infrastructure := loader.LoadInfrastructure("simdata/infrastructure/small.json")
+	se.infrastructureName = infrastructure.Name
 
 	se.agents = []agent.Runner{
 		agent.NewDummy("Dummy 1"),
@@ -31,6 +33,10 @@ func New() *Simulation {
 	se.network = network.New()
 
 	se.ticker = ticker.New(se.agents) // ticker initialization starts all agents
+
+	log.WithFields(log.Fields{
+		"infrastructure": se.infrastructureName,
+	}).Info("Simulation initialized")
 
 	return se
 }
