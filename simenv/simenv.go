@@ -20,8 +20,8 @@ func New() *Simenv {
 	se.network = network.New()
 
 	se.agents = []agent.Runner{
-		agent.Dummy{Name: "Agent 1"},
-		agent.Dummy{Name: "Agent 2"},
+		agent.NewDummy("Agent 1"),
+		agent.NewDummy("Agent 2"),
 	}
 
 	for _, ag := range se.agents {

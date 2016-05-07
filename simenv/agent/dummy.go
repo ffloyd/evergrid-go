@@ -4,23 +4,31 @@ import log "github.com/Sirupsen/logrus"
 
 // Dummy is a simple agent which only writes currentTick in log
 type Dummy struct {
-	Name string
+	Agent
 }
 
-func (agent Dummy) run(chans *Chans) {
+// NewDummy creates new dummy agent
+func NewDummy(name string) *Dummy {
+	dummy := new(Dummy)
+	dummy.name = name
+	dummy.chans = NewChans()
+
+	log.WithField("name", dummy).Info("New dummy agent created")
+	return dummy
+}
+
+func (agent Dummy) run() {
 	for {
 		log.WithFields(log.Fields{
-			"tick":  <-chans.Ticks,
-			"agent": agent.Name,
+			"tick":  <-agent.chans.Ticks,
+			"agent": agent,
 		}).Debug("received tick")
-		chans.Ready <- true
+		agent.chans.Ready <- true
 	}
 }
 
 // Run is implementation of agent.Runner iface
 func (agent Dummy) Run() *Chans {
-	chans := NewChans()
-
-	go agent.run(chans)
-	return chans
+	go agent.run()
+	return agent.chans
 }
