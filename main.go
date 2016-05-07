@@ -8,7 +8,6 @@ import (
 func main() {
 	log.SetLevel(log.DebugLevel)
 
-	simulation.New()
-	// sim := simulation.New()
-	// sim.Run()
+	sim := simulation.New()
+	sim.Run()
 }

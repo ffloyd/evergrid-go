@@ -1,6 +1,6 @@
 package agent
 
-// Runner must be implemented for interaction with GlobalTimer
+// Runner must be implemented for every agent
 type Runner interface {
 	Run() *Chans
 }

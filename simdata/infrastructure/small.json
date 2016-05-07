@@ -4,15 +4,32 @@
         "name": "Small network",
         "segments": [{
             "name": "Segment 1",
+            "innerBandwith": [100, 100],
             "nodes": [{
-                "name": "Node 1",
+                "name": "Node A",
+                "outerBandwith": [50, 50],
                 "agents": [{
-                    "name": "Dummy 1",
+                    "name": "Dummy 1.1",
                     "type": "dummy"
                 }]
             }]
         }, {
-            "name": "Segment 2"
+            "name": "Segment 2",
+            "nodes": [{
+                "name": "Node B",
+                "outerBandwith": [50, 50],
+                "agents": [{
+                    "name": "Dummy 2.1",
+                    "type": "dummy"
+                }]
+            }, {
+                "name": "Node C",
+                "outerBandwith": [50, 50],
+                "agents": [{
+                    "name": "Dummy 2.2",
+                    "type": "dummy"
+                }]
+            }]
         }]
     }
 }

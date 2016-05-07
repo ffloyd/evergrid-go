@@ -13,7 +13,7 @@ func NewDummy(name string) *Dummy {
 	dummy.name = name
 	dummy.chans = NewChans()
 
-	log.WithField("name", dummy).Info("New dummy agent created")
+	log.WithField("name", dummy).Info("Dummy agent initialized")
 	return dummy
 }
 

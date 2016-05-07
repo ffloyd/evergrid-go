@@ -20,25 +20,21 @@ type Simulation struct {
 
 // New generates new simulation environment
 func New() *Simulation {
-	se := new(Simulation)
-
 	infrastructure := loader.LoadInfrastructure("simdata/infrastructure/small.json")
-	se.infrastructureName = infrastructure.Name
 
-	se.agents = []agent.Runner{
-		agent.NewDummy("Dummy 1"),
-		agent.NewDummy("Dummy 2"),
+	sim := &Simulation{
+		infrastructureName: infrastructure.Name,
+		network:            network.New(infrastructure.Network),
 	}
 
-	se.network = network.New()
-
-	se.ticker = ticker.New(se.agents) // ticker initialization starts all agents
+	sim.agents = sim.network.Agents()
+	sim.ticker = ticker.New(sim.agents)
 
 	log.WithFields(log.Fields{
-		"infrastructure": se.infrastructureName,
+		"infrastructure": sim.infrastructureName,
 	}).Info("Simulation initialized")
 
-	return se
+	return sim
 }
 
 // Run starts simulation
