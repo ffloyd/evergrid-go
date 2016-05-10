@@ -8,18 +8,13 @@ import (
 
 // Node represents particular machine
 type Node struct {
-	name          string
-	outerBandwith Bandwith // bandwith for communication with nodes outside the network segment
-	agents        []agent.Runner
+	name   string
+	agents []agent.Runner
 }
 
 func newNode(config loader.Node) *Node {
 	node := &Node{
 		name: config.Name,
-		outerBandwith: Bandwith{
-			In:  config.OuterBandwith[0],
-			Out: config.OuterBandwith[1],
-		},
 	}
 
 	node.agents = make([]agent.Runner, len(config.Agents))

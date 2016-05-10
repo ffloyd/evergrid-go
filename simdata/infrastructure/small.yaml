@@ -5,27 +5,27 @@ network:
     -
       name: Segment 1
       innerBandwith: [100, 100]
+      outerBandwith: [50, 50]
       nodes:
         -
           name: Node A
-          outerBandwith: [50, 50]
           agents:
             -
               name: Dummy 1.1
               type: dummy
     -
       name: Segment 2
+      innerBandwith: [100, 100]
+      outerBandwith: [50, 50]
       nodes:
         -
           name: Node B
-          outerBandwith: [50, 50]
           agents:
             -
               name: Dummy 2.1
               type: dummy
         -
           name: Node C
-          outerBandwith: [50, 50]
           agents:
             -
               name: Dummy 2.2

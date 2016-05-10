@@ -10,6 +10,7 @@ import (
 type Segment struct {
 	name          string
 	innerBandwith Bandwith // bandwith for communication inside this segment
+	outerBandwith Bandwith // bandwith for communication with nodes outside the network segment
 
 	nodes []*Node
 }
@@ -20,6 +21,10 @@ func newSegment(config loader.Segment) *Segment {
 		innerBandwith: Bandwith{
 			In:  config.InnerBandwith[0],
 			Out: config.InnerBandwith[1],
+		},
+		outerBandwith: Bandwith{
+			In:  config.OuterBandwith[0],
+			Out: config.OuterBandwith[1],
 		},
 	}
 

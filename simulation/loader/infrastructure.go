@@ -23,14 +23,14 @@ type Network struct {
 type Segment struct {
 	Name          string
 	InnerBandwith [2]int
+	OuterBandwith [2]int
 	Nodes         []Node
 }
 
 // Node is a representation of network node section in json infrastructure file
 type Node struct {
-	Name          string
-	OuterBandwith [2]int
-	Agents        []Agent
+	Name   string
+	Agents []Agent
 }
 
 // Agent is a representation of agent section in json infrastructure file
