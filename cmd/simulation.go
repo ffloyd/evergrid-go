@@ -16,7 +16,7 @@ var simulationCmd = &cobra.Command{
 	Short:     "Starts simulation with given options",
 	Long: `Starts simulation with given infracstructure.
 
-INFRASTRUCTURE argument is a name (without path or extension) of json file with infracstructure config.`,
+INFRASTRUCTURE argument is a name (without path or extension) of YAML file with infracstructure config.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			fmt.Println("INFRASTRUCTURE argument missing")

@@ -1,10 +1,10 @@
 package loader
 
 import (
-	"encoding/json"
 	"io/ioutil"
 
 	log "github.com/Sirupsen/logrus"
+	"gopkg.in/yaml.v2"
 )
 
 // Infrastucture is a representation of json infrastucture file
@@ -47,7 +47,7 @@ func LoadInfrastructure(filename string) *Infrastucture {
 	}
 
 	parsed := new(Infrastucture)
-	json.Unmarshal(data, parsed)
+	yaml.Unmarshal(data, parsed)
 
 	return parsed
 }
