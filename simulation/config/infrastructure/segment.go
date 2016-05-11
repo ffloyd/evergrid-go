@@ -22,17 +22,17 @@ type Segment struct {
 
 // Parse transform unmarshalled config to internal config representation
 // all validations must be performed on this stage
-func (yamlData SegmentYAML) Parse(parent *Network) *Segment {
-	result := &Segment{
-		Name:          yamlData.Name,
-		InnerBandwith: yamlData.InnerBandwith,
-		OuterBandwith: yamlData.OuterBandwith,
+func (segmentYAML SegmentYAML) Parse(parent *Network) *Segment {
+	segment := &Segment{
+		Name:          segmentYAML.Name,
+		InnerBandwith: segmentYAML.InnerBandwith,
+		OuterBandwith: segmentYAML.OuterBandwith,
 		Network:       parent,
 	}
 
-	nodes, agentsCount := make([]*Node, len(yamlData.Nodes)), 0
-	for i, nodeYAML := range yamlData.Nodes {
-		nodes[i] = nodeYAML.Parse(result)
+	nodes, agentsCount := make([]*Node, len(segmentYAML.Nodes)), 0
+	for i, nodeYAML := range segmentYAML.Nodes {
+		nodes[i] = nodeYAML.Parse(segment)
 		agentsCount += len(nodes[i].Agents)
 	}
 
@@ -41,8 +41,8 @@ func (yamlData SegmentYAML) Parse(parent *Network) *Segment {
 		agents = append(agents, node.Agents...)
 	}
 
-	result.Nodes = nodes
-	result.Agents = agents
+	segment.Nodes = nodes
+	segment.Agents = agents
 
-	return result
+	return segment
 }

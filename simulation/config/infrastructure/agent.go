@@ -16,10 +16,10 @@ type Agent struct {
 
 // Parse transform unmarshalled config to internal config representation
 // all validations must be performed on this stage
-func (yamlData AgentYAML) Parse(parent *Node) *Agent {
+func (agentYAML AgentYAML) Parse(parent *Node) *Agent {
 	return &Agent{
-		Name: yamlData.Name,
-		Type: yamlData.Type,
+		Name: agentYAML.Name,
+		Type: agentYAML.Type,
 		Node: parent,
 	}
 }

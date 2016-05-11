@@ -12,7 +12,7 @@ type Ticker struct {
 }
 
 // New creates a new Ticker. Also it runs all agents because it essential for correct work of ticker.
-func New(agents []agent.Runner) *Ticker {
+func New(agents []agent.Agent) *Ticker {
 	defer log.Info("New ticker initialized")
 
 	ticker := new(Ticker)

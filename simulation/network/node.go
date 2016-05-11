@@ -10,14 +10,14 @@ import (
 type Node struct {
 	name    string
 	segment *Segment
-	agents  map[string]agent.Runner
+	agents  map[string]agent.Agent
 }
 
 func newNode(config *infrastructure.Node, parent *Segment) *Node {
 	node := &Node{
 		name:    config.Name,
 		segment: parent,
-		agents:  make(map[string]agent.Runner),
+		agents:  make(map[string]agent.Agent),
 	}
 
 	log.WithField("name", node.name).Info("Network node initialized")
@@ -25,6 +25,6 @@ func newNode(config *infrastructure.Node, parent *Segment) *Node {
 }
 
 // AttachAgent adds agent to node's agents list
-func (node *Node) AttachAgent(name string, agent agent.Runner) {
-	node.agents[name] = agent
+func (node *Node) AttachAgent(agent agent.Agent) {
+	node.agents[agent.Name()] = agent
 }

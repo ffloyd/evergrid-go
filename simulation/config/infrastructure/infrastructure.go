@@ -8,38 +8,38 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-// InfrastuctureYAML is a representation of YAML infrastructure file
-type InfrastuctureYAML struct {
+// ConfigYAML is a representation of YAML infrastructure file
+type ConfigYAML struct {
 	Name    string
 	Network NetworkYAML
 }
 
-// Infrastucture struct is a config for creation
-type Infrastucture struct {
+// Config for infrastructure creation
+type Config struct {
 	Name    string
 	Network *Network
 }
 
 // LoadYAML for loading config from YAML
-func LoadYAML(configFilename string) *InfrastuctureYAML {
-	data, e := ioutil.ReadFile(configFilename)
+func LoadYAML(configFilename string) *ConfigYAML {
+	rawYAML, e := ioutil.ReadFile(configFilename)
 	if e != nil {
 		log.Fatalf("File error: %v", e)
 	}
 
-	result := new(InfrastuctureYAML)
-	yaml.Unmarshal(data, result)
+	configYAML := new(ConfigYAML)
+	yaml.Unmarshal(rawYAML, configYAML)
 
-	return result
+	return configYAML
 }
 
 // Parse transform unmarshalled config to internal config representation
 // all validations must be performed on this stage
-func (yamlData InfrastuctureYAML) Parse() *Infrastucture {
-	result := &Infrastucture{
-		Name: yamlData.Name,
+func (configYAML ConfigYAML) Parse() *Config {
+	config := &Config{
+		Name: configYAML.Name,
 	}
-	result.Network = yamlData.Network.Parse(result)
+	config.Network = configYAML.Network.Parse(config)
 
-	return result
+	return config
 }

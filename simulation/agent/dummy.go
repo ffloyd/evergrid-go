@@ -4,7 +4,7 @@ import log "github.com/Sirupsen/logrus"
 
 // Dummy is a simple agent which only writes currentTick in log
 type Dummy struct {
-	Agent
+	agentBase
 }
 
 // NewDummy creates new dummy agent

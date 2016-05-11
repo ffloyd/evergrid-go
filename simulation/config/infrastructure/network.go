@@ -11,7 +11,7 @@ type Network struct {
 	Name     string
 	Segments []*Segment
 
-	Infrastucture *Infrastucture // parent
+	Infrastucture *Config // parent
 
 	Nodes  []*Node  // all nodes inside network
 	Agents []*Agent // all agents inside network
@@ -19,15 +19,15 @@ type Network struct {
 
 // Parse transform unmarshalled config to internal config representation
 // all validations must be performed on this stage
-func (yamlData NetworkYAML) Parse(parent *Infrastucture) *Network {
-	result := &Network{
-		Name:          yamlData.Name,
+func (networkYAML NetworkYAML) Parse(parent *Config) *Network {
+	networkCfg := &Network{
+		Name:          networkYAML.Name,
 		Infrastucture: parent,
 	}
 
-	segments, nodesCount, agentsCount := make([]*Segment, len(yamlData.Segments)), 0, 0
-	for i, segmentYAML := range yamlData.Segments {
-		segments[i] = segmentYAML.Parse(result)
+	segments, nodesCount, agentsCount := make([]*Segment, len(networkYAML.Segments)), 0, 0
+	for i, segmentYAML := range networkYAML.Segments {
+		segments[i] = segmentYAML.Parse(networkCfg)
 		nodesCount += len(segments[i].Nodes)
 		agentsCount += len(segments[i].Agents)
 	}
@@ -37,9 +37,9 @@ func (yamlData NetworkYAML) Parse(parent *Infrastucture) *Network {
 		nodes, agents = append(nodes, segment.Nodes...), append(agents, segment.Agents...)
 	}
 
-	result.Segments = segments
-	result.Nodes = nodes
-	result.Agents = agents
+	networkCfg.Segments = segments
+	networkCfg.Nodes = nodes
+	networkCfg.Agents = agents
 
-	return result
+	return networkCfg
 }

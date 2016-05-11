@@ -16,18 +16,18 @@ type Node struct {
 
 // Parse transform unmarshalled config to internal config representation
 // all validations must be performed on this stage
-func (yamlData NodeYAML) Parse(parent *Segment) *Node {
-	result := &Node{
-		Name:    yamlData.Name,
+func (nodeYAML NodeYAML) Parse(parent *Segment) *Node {
+	node := &Node{
+		Name:    nodeYAML.Name,
 		Segment: parent,
 	}
 
-	agents := make([]*Agent, len(yamlData.Agents))
-	for i, agentYAML := range yamlData.Agents {
-		agents[i] = agentYAML.Parse(result)
+	agents := make([]*Agent, len(nodeYAML.Agents))
+	for i, agentYAML := range nodeYAML.Agents {
+		agents[i] = agentYAML.Parse(node)
 	}
 
-	result.Agents = agents
+	node.Agents = agents
 
-	return result
+	return node
 }

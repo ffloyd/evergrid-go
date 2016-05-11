@@ -11,25 +11,26 @@ import (
 
 // Simulation represents whole simulation environment
 type Simulation struct {
-	infrastructureConfig *infrastructure.Infrastucture
+	infrastructureConfig *infrastructure.Config
 
 	ticker  *ticker.Ticker
 	network *network.Network
-	agents  []agent.Runner
+	agents  []agent.Agent
 }
 
 // New generates new simulation environment
-func New(infraFilename string) *Simulation {
+func New(infrastructureFile string) *Simulation {
 	sim := &Simulation{
-		infrastructureConfig: infrastructure.LoadYAML(infraFilename).Parse(),
+		infrastructureConfig: infrastructure.LoadYAML(infrastructureFile).Parse(),
 	}
 
 	sim.network = network.New(sim.infrastructureConfig.Network)
 
-	sim.agents = make([]agent.Runner, len(sim.infrastructureConfig.Network.Agents))
+	sim.agents = make([]agent.Agent, len(sim.infrastructureConfig.Network.Agents))
 	for i, agentConfig := range sim.infrastructureConfig.Network.Agents {
-		sim.agents[i] = agent.New(agentConfig)
-		sim.network.Node(agentConfig.Node.Name).AttachAgent(agentConfig.Name, sim.agents[i])
+		agent := agent.New(agentConfig)
+		sim.agents[i] = agent
+		sim.network.Node(agentConfig.Node.Name).AttachAgent(agent)
 	}
 
 	sim.ticker = ticker.New(sim.agents)
