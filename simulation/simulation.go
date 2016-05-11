@@ -2,7 +2,7 @@ package simulation
 
 import (
 	"github.com/ffloyd/evergrid-go/simulation/agent"
-	"github.com/ffloyd/evergrid-go/simulation/loader"
+	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 	"github.com/ffloyd/evergrid-go/simulation/network"
 	"github.com/ffloyd/evergrid-go/simulation/ticker"
 
@@ -11,7 +11,7 @@ import (
 
 // Simulation represents whole simulation environment
 type Simulation struct {
-	infrastructureName string
+	infrastructureConfig *infrastructure.Infrastucture
 
 	ticker  *ticker.Ticker
 	network *network.Network
@@ -20,18 +20,22 @@ type Simulation struct {
 
 // New generates new simulation environment
 func New(infraFilename string) *Simulation {
-	infrastructure := loader.LoadInfrastructure(infraFilename)
-
 	sim := &Simulation{
-		infrastructureName: infrastructure.Name,
-		network:            network.New(infrastructure.Network),
+		infrastructureConfig: infrastructure.LoadYAML(infraFilename).Parse(),
 	}
 
-	sim.agents = sim.network.Agents()
+	sim.network = network.New(sim.infrastructureConfig.Network)
+
+	sim.agents = make([]agent.Runner, len(sim.infrastructureConfig.Network.Agents))
+	for i, agentConfig := range sim.infrastructureConfig.Network.Agents {
+		sim.agents[i] = agent.New(agentConfig)
+		sim.network.Node(agentConfig.Node.Name).AttachAgent(agentConfig.Name, sim.agents[i])
+	}
+
 	sim.ticker = ticker.New(sim.agents)
 
 	log.WithFields(log.Fields{
-		"infrastructure": sim.infrastructureName,
+		"infrastructure": sim.infrastructureConfig.Name,
 	}).Info("Simulation initialized")
 
 	return sim

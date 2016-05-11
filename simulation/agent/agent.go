@@ -2,7 +2,7 @@ package agent
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/loader"
+	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 )
 
 // Agent is a common part for all types of agents in simulation
@@ -17,7 +17,7 @@ func (agent Agent) String() string {
 }
 
 // New initializes agent from config
-func New(config loader.Agent) Runner {
+func New(config *infrastructure.Agent) Runner {
 	var agent Runner
 	switch config.Type {
 	case "dummy":

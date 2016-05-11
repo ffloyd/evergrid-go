@@ -2,8 +2,7 @@ package network
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/agent"
-	"github.com/ffloyd/evergrid-go/simulation/loader"
+	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 )
 
 // Segment represents a local connected scope of machines. As example - if they are part of same DigitalOcean region.
@@ -11,11 +10,12 @@ type Segment struct {
 	name          string
 	innerBandwith Bandwith // bandwith for communication inside this segment
 	outerBandwith Bandwith // bandwith for communication with nodes outside the network segment
+	network       *Network
 
-	nodes []*Node
+	nodes map[string]*Node
 }
 
-func newSegment(config loader.Segment) *Segment {
+func newSegment(config *infrastructure.Segment, parent *Network) *Segment {
 	segment := &Segment{
 		name: config.Name,
 		innerBandwith: Bandwith{
@@ -26,23 +26,15 @@ func newSegment(config loader.Segment) *Segment {
 			In:  config.OuterBandwith[0],
 			Out: config.OuterBandwith[1],
 		},
+		network: parent,
+		nodes:   make(map[string]*Node),
 	}
 
-	segment.nodes = make([]*Node, len(config.Nodes))
-	for i, nodeConfig := range config.Nodes {
-		segment.nodes[i] = newNode(nodeConfig)
+	for _, nodeConfig := range config.Nodes {
+		segment.nodes[nodeConfig.Name] = newNode(nodeConfig, segment)
 	}
 
 	log.WithField("name", segment.name).Info("Network segment initialized")
 
 	return segment
-}
-
-// agents return list of all agents inside segment
-func (segment Segment) agents() []agent.Runner {
-	var result []agent.Runner
-	for _, node := range segment.nodes {
-		result = append(result, node.agents...)
-	}
-	return result
 }
