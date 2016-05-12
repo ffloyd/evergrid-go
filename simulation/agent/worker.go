@@ -28,15 +28,15 @@ func NewWorker(config *infrastructure.Agent, net *network.Network, env *Environ)
 func (worker Worker) run() {
 	for {
 		log.WithFields(log.Fields{
-			"tick":  <-worker.chans.Ticks,
+			"tick":  <-worker.tickerChans.Ticks,
 			"agent": worker,
 		}).Debug("received tick")
-		worker.chans.Ready <- true
+		worker.tickerChans.Ready <- true
 	}
 }
 
 // Run is implementation of agent.Runner iface
-func (worker Worker) Run() *Chans {
+func (worker Worker) Run() *TickerChans {
 	go worker.run()
-	return worker.chans
+	return worker.tickerChans
 }

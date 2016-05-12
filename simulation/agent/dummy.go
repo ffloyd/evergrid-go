@@ -25,15 +25,15 @@ func NewDummy(config *infrastructure.Agent, net *network.Network, env *Environ) 
 func (agent Dummy) run() {
 	for {
 		log.WithFields(log.Fields{
-			"tick":  <-agent.chans.Ticks,
+			"tick":  <-agent.tickerChans.Ticks,
 			"agent": agent,
 		}).Debug("received tick")
-		agent.chans.Ready <- true
+		agent.tickerChans.Ready <- true
 	}
 }
 
 // Run is implementation of agent.Runner iface
-func (agent Dummy) Run() *Chans {
+func (agent Dummy) Run() *TickerChans {
 	go agent.run()
-	return agent.chans
+	return agent.tickerChans
 }

@@ -8,7 +8,7 @@ import (
 // Ticker is a global timer like NetLogo's one
 type Ticker struct {
 	currentTick int
-	agentChans  []*agent.Chans
+	agentChans  []*agent.TickerChans
 }
 
 // New creates a new Ticker. Also it runs all agents because it essential for correct work of ticker.
@@ -17,7 +17,7 @@ func New(agents []agent.Agent) *Ticker {
 
 	ticker := new(Ticker)
 
-	ticker.agentChans = make([]*agent.Chans, len(agents))
+	ticker.agentChans = make([]*agent.TickerChans, len(agents))
 	for i, agent := range agents {
 		ticker.agentChans[i] = agent.Run()
 	}
