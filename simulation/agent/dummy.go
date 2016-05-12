@@ -1,17 +1,21 @@
 package agent
 
-import log "github.com/Sirupsen/logrus"
+import (
+	log "github.com/Sirupsen/logrus"
+	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
+	"github.com/ffloyd/evergrid-go/simulation/network"
+)
 
 // Dummy is a simple agent which only writes currentTick in log
 type Dummy struct {
-	agentBase
+	Base
 }
 
-// NewDummy creates new dummy agent
-func NewDummy(name string) *Dummy {
-	dummy := new(Dummy)
-	dummy.name = name
-	dummy.chans = NewChans()
+// newDummy creates new dummy agent
+func newDummy(config *infrastructure.Agent, net *network.Network) *Dummy {
+	dummy := &Dummy{
+		Base: *NewBase(config, net),
+	}
 
 	log.WithField("name", dummy).Info("Dummy agent initialized")
 	return dummy

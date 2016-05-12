@@ -28,9 +28,7 @@ func New(infrastructureFile string) *Simulation {
 
 	sim.agents = make([]agent.Agent, len(sim.infrastructureConfig.Network.Agents))
 	for i, agentConfig := range sim.infrastructureConfig.Network.Agents {
-		agent := agent.New(agentConfig)
-		sim.agents[i] = agent
-		sim.network.Node(agentConfig.Node.Name).AttachAgent(agent)
+		sim.agents[i] = agent.New(agentConfig, sim.network)
 	}
 
 	sim.ticker = ticker.New(sim.agents)
