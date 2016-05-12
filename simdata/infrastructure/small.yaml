@@ -3,30 +3,71 @@ network:
   name: Small network
   segments:
     -
-      name: Segment 1
+      name: Web Segment
       innerBandwith: [100, 100]
       outerBandwith: [50, 50]
       nodes:
         -
-          name: Node A
+          name: Web Node
           agents:
             -
-              name: Dummy 1.1
-              type: dummy
+              name: Core
+              type: core
     -
-      name: Segment 2
+      name: Segment A
       innerBandwith: [100, 100]
       outerBandwith: [50, 50]
       nodes:
         -
-          name: Node B
+          name: Control Node A
           agents:
             -
-              name: Dummy 2.1
-              type: dummy
+              name: Control Unit A
+              type: control_unit
         -
-          name: Node C
+          name: Worker A1 Node
           agents:
             -
-              name: Dummy 2.2
-              type: dummy
+              name: Worker A1
+              type: worker
+        -
+          name: Worker A2 Node
+          agents:
+            -
+              name: Worker A2
+              type: worker
+        -
+          name: Worker A3 Node
+          agents:
+            -
+              name: Worker A3
+              type: worker
+    -
+      name: Segment B
+      innerBandwith: [100, 100]
+      outerBandwith: [50, 50]
+      nodes:
+        -
+          name: Control Node B
+          agents:
+            -
+              name: Control Unit B
+              type: control_unit
+        -
+          name: Worker B1 Node
+          agents:
+            -
+              name: Worker B1
+              type: worker
+        -
+          name: Worker B2 Node
+          agents:
+            -
+              name: Worker B2
+              type: worker
+        -
+          name: Worker B3 Node
+          agents:
+            -
+              name: Worker B3
+              type: worker

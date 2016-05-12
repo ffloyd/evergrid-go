@@ -25,3 +25,19 @@ func NewCore(config *infrastructure.Agent, net *network.Network, env *Environ) *
 	}).Info("Core agent initialized")
 	return core
 }
+
+func (core Core) run() {
+	for {
+		log.WithFields(log.Fields{
+			"tick":  <-core.tickerChans.Ticks,
+			"agent": core,
+		}).Debug("received tick")
+		core.tickerChans.Ready <- true
+	}
+}
+
+// Run is implementation of agent.Runner iface
+func (core Core) Run() *TickerChans {
+	go core.run()
+	return core.tickerChans
+}

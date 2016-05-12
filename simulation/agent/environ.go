@@ -11,14 +11,16 @@ type Environ struct {
 // NewEnviron is a simple initializer
 func NewEnviron() *Environ {
 	return &Environ{
-		Dummies: make(map[string]*Dummy),
-		Workers: make(map[string]*Worker),
+		Dummies:      make(map[string]*Dummy),
+		Workers:      make(map[string]*Worker),
+		ControlUnits: make(map[string]*ControlUnit),
+		Cores:        make(map[string]*Core),
 	}
 }
 
 // AllAgents returns slice of all agents
 func (env Environ) AllAgents() []Agent {
-	agentsCount := len(env.Dummies) + len(env.Workers)
+	agentsCount := len(env.Dummies) + len(env.Workers) + len(env.ControlUnits) + len(env.Cores)
 	agents := make([]Agent, agentsCount)
 	i := 0
 
@@ -29,6 +31,17 @@ func (env Environ) AllAgents() []Agent {
 
 	for _, worker := range env.Workers {
 		agents[i] = worker
+		i++
+	}
+
+	for _, unit := range env.ControlUnits {
+		agents[i] = unit
+		i++
+	}
+
+	for _, core := range env.Cores {
+		agents[i] = core
+		i++
 	}
 
 	return agents

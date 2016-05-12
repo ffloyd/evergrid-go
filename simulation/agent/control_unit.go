@@ -26,3 +26,19 @@ func NewControlUnit(config *infrastructure.Agent, net *network.Network, env *Env
 	}).Info("Control Unit agent initialized")
 	return unit
 }
+
+func (unit ControlUnit) run() {
+	for {
+		log.WithFields(log.Fields{
+			"tick":  <-unit.tickerChans.Ticks,
+			"agent": unit,
+		}).Debug("received tick")
+		unit.tickerChans.Ready <- true
+	}
+}
+
+// Run is implementation of agent.Runner iface
+func (unit ControlUnit) Run() *TickerChans {
+	go unit.run()
+	return unit.tickerChans
+}
