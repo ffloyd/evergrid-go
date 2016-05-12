@@ -5,6 +5,7 @@ type Environ struct {
 	Dummies      map[string]*Dummy
 	Workers      map[string]*Worker
 	ControlUnits map[string]*ControlUnit
+	Cores        map[string]*Core
 }
 
 // NewEnviron is a simple initializer
