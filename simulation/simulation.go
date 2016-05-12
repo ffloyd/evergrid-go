@@ -15,23 +15,24 @@ type Simulation struct {
 
 	ticker  *ticker.Ticker
 	network *network.Network
-	agents  []agent.Agent
+
+	agents *agent.Environ
 }
 
 // New generates new simulation environment
 func New(infrastructureFile string) *Simulation {
 	sim := &Simulation{
 		infrastructureConfig: infrastructure.LoadYAML(infrastructureFile).Parse(),
+		agents:               agent.NewEnviron(),
 	}
 
 	sim.network = network.New(sim.infrastructureConfig.Network)
 
-	sim.agents = make([]agent.Agent, len(sim.infrastructureConfig.Network.Agents))
-	for i, agentConfig := range sim.infrastructureConfig.Network.Agents {
-		sim.agents[i] = agent.New(agentConfig, sim.network)
+	for _, agentConfig := range sim.infrastructureConfig.Network.Agents {
+		sim.addAgent(agentConfig)
 	}
 
-	sim.ticker = ticker.New(sim.agents)
+	sim.ticker = ticker.New(sim.agents.AllAgents())
 
 	log.WithFields(log.Fields{
 		"infrastructure": sim.infrastructureConfig.Name,
@@ -40,7 +41,18 @@ func New(infrastructureFile string) *Simulation {
 	return sim
 }
 
+func (sim *Simulation) addAgent(agentConfig *infrastructure.Agent) {
+	switch agentConfig.Type {
+	case "dummy":
+		agent.NewDummy(agentConfig, sim.network, sim.agents)
+	case "worker":
+		agent.NewWorker(agentConfig, sim.network, sim.agents)
+	default:
+		log.Fatalf("Unknown agent type: %s", agentConfig.Type)
+	}
+}
+
 // Run starts simulation
-func (se Simulation) Run() {
-	se.ticker.Run()
+func (sim Simulation) Run() {
+	sim.ticker.Run()
 }

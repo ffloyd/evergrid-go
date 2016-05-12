@@ -11,6 +11,7 @@ type Base struct {
 	name  string
 	node  *network.Node
 	chans *Chans
+	env   *Environ
 }
 
 // String for implement Stringer interface
@@ -29,11 +30,12 @@ func (agent Base) Node() *network.Node {
 }
 
 // NewBase is common initialization part all agents
-func NewBase(config *infrastructure.Agent, net *network.Network) *Base {
+func NewBase(config *infrastructure.Agent, net *network.Network, env *Environ) *Base {
 	node := net.Node(config.Node.Name)
 	base := &Base{
 		name:  config.Name,
 		node:  node,
+		env:   env,
 		chans: NewChans(),
 	}
 	node.AttachAgent(base)

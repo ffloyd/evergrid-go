@@ -2,8 +2,8 @@ package agent
 
 // Chans is struct for communication between Ticker and agents
 type Chans struct {
-	Ready chan bool // for incoming ready status
-	Ticks chan int  // for ticks broadcasting
+	Ready chan bool // for ready status (agent -> ticker)
+	Ticks chan int  // for ticks broadcasting (ticker -> agent)
 }
 
 // NewChans initializes correct Chans instanse

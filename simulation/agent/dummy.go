@@ -11,11 +11,12 @@ type Dummy struct {
 	Base
 }
 
-// newDummy creates new dummy agent
-func newDummy(config *infrastructure.Agent, net *network.Network) *Dummy {
+// NewDummy creates new dummy agent
+func NewDummy(config *infrastructure.Agent, net *network.Network, env *Environ) *Dummy {
 	dummy := &Dummy{
-		Base: *NewBase(config, net),
+		Base: *NewBase(config, net, env),
 	}
+	env.Dummies[dummy.Name()] = dummy
 
 	log.WithField("name", dummy).Info("Dummy agent initialized")
 	return dummy
