@@ -1,6 +1,8 @@
 package network
 
 import (
+	"fmt"
+
 	log "github.com/Sirupsen/logrus"
 	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 )
@@ -26,4 +28,9 @@ func newNode(config *infrastructure.Node, parent *Segment) *Node {
 // AttachAgent adds agent to node's agents list
 func (node *Node) AttachAgent(agent Agent) {
 	node.agents[agent.Name()] = agent
+}
+
+// String implements fmt.Stringer interface
+func (node Node) String() string {
+	return fmt.Sprintf("%s (%s)", node.name, node.segment.name)
 }

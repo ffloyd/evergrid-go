@@ -47,6 +47,8 @@ func (sim *Simulation) addAgent(agentConfig *infrastructure.Agent) {
 		agent.NewDummy(agentConfig, sim.network, sim.agents)
 	case "worker":
 		agent.NewWorker(agentConfig, sim.network, sim.agents)
+	case "control_unit":
+		agent.NewControlUnit(agentConfig, sim.network, sim.agents)
 	default:
 		log.Fatalf("Unknown agent type: %s", agentConfig.Type)
 	}

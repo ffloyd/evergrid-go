@@ -2,8 +2,9 @@ package agent
 
 // Environ is a set of all agents in the system
 type Environ struct {
-	Dummies map[string]*Dummy
-	Workers map[string]*Worker
+	Dummies      map[string]*Dummy
+	Workers      map[string]*Worker
+	ControlUnits map[string]*ControlUnit
 }
 
 // NewEnviron is a simple initializer

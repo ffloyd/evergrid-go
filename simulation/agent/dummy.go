@@ -18,7 +18,10 @@ func NewDummy(config *infrastructure.Agent, net *network.Network, env *Environ) 
 	}
 	env.Dummies[dummy.Name()] = dummy
 
-	log.WithField("name", dummy).Info("Dummy agent initialized")
+	log.WithFields(log.Fields{
+		"name": dummy.Name(),
+		"node": dummy.Node(),
+	}).Info("Dummy agent initialized")
 	return dummy
 }
 
