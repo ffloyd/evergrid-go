@@ -2,8 +2,9 @@ package workloadcfg
 
 import (
 	"io/ioutil"
-	"log"
 	"path/filepath"
+
+	log "github.com/Sirupsen/logrus"
 
 	"gopkg.in/yaml.v2"
 
@@ -54,6 +55,11 @@ func Load(workloadFilename string) *WorkloadCfg {
 			workloadCfg.Requests[tick][i] = reqYAML.Parse(workloadCfg.Data)
 		}
 	}
+
+	log.WithFields(log.Fields{
+		"file": absPath,
+		"name": workloadCfg.Name,
+	}).Info("Workload config parsed and loaded")
 
 	return workloadCfg
 }

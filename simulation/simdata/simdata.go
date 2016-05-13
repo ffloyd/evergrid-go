@@ -2,8 +2,9 @@ package simdata
 
 import (
 	"io/ioutil"
-	"log"
 	"path/filepath"
+
+	log "github.com/Sirupsen/logrus"
 
 	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 	"github.com/ffloyd/evergrid-go/simulation/simdata/workloadcfg"
@@ -49,6 +50,11 @@ func Load(simdataFilename string) *SimData {
 
 	workloadFilename := filepath.Join(basePath, "workloads", configYAML.Workload)
 	simdata.Workload = workloadcfg.Load(workloadFilename)
+
+	log.WithFields(log.Fields{
+		"file": absPath,
+		"name": simdata.Name,
+	}).Info("Simulation config parsed and loaded")
 
 	return simdata
 }

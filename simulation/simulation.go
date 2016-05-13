@@ -36,7 +36,7 @@ func New(simdataFilename string) *Simulation {
 	sim.ticker = ticker.New(sim.agents.AllAgents())
 
 	log.WithFields(log.Fields{
-		"infrastructure": sim.simData.Name,
+		"name": sim.simData.Name,
 	}).Info("Simulation initialized")
 
 	return sim
