@@ -6,4 +6,4 @@ datasets:
 processors:
     -
         name: Processor 1
-        gflopsPerMb: 512
+        gflops_per_mb: 512
