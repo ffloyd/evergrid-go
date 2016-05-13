@@ -1,8 +1,8 @@
 package agent
 
 import (
-	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 	"github.com/ffloyd/evergrid-go/simulation/network"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
 
 // Base is a common part for all types of agents in simulation
@@ -30,7 +30,7 @@ func (agent Base) Node() *network.Node {
 }
 
 // NewBase is common initialization part all agents
-func NewBase(config *infrastructure.Agent, net *network.Network, env *Environ) *Base {
+func NewBase(config *networkcfg.Agent, net *network.Network, env *Environ) *Base {
 	node := net.Node(config.Node.Name)
 	base := &Base{
 		name:        config.Name,

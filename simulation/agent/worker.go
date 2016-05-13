@@ -2,8 +2,8 @@ package agent
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 	"github.com/ffloyd/evergrid-go/simulation/network"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
 
 // Worker is an agent which represents processes
@@ -12,7 +12,7 @@ type Worker struct {
 }
 
 // NewWorker creates new worker agent
-func NewWorker(config *infrastructure.Agent, net *network.Network, env *Environ) *Worker {
+func NewWorker(config *networkcfg.Agent, net *network.Network, env *Environ) *Worker {
 	worker := &Worker{
 		Base: *NewBase(config, net, env),
 	}

@@ -2,8 +2,8 @@ package agent
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 	"github.com/ffloyd/evergrid-go/simulation/network"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
 
 // Dummy is a simple agent which only writes currentTick in log
@@ -12,7 +12,7 @@ type Dummy struct {
 }
 
 // NewDummy creates new dummy agent
-func NewDummy(config *infrastructure.Agent, net *network.Network, env *Environ) *Dummy {
+func NewDummy(config *networkcfg.Agent, net *network.Network, env *Environ) *Dummy {
 	dummy := &Dummy{
 		Base: *NewBase(config, net, env),
 	}

@@ -1,4 +1,4 @@
-package infrastructure
+package networkcfg
 
 // NetworkYAML is a representation of network section in YAML infrastructure file
 type NetworkYAML struct {

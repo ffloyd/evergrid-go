@@ -2,7 +2,7 @@ package network
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
 
 // Network represents all network stats for all machines in simulation.
@@ -14,7 +14,7 @@ type Network struct {
 }
 
 // New creates a new network basing on config
-func New(config *infrastructure.Network) *Network {
+func New(config *networkcfg.Network) *Network {
 	network := &Network{
 		name:     config.Name,
 		segments: make(map[string]*Segment),

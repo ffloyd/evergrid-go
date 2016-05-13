@@ -1,4 +1,4 @@
-package infrastructure
+package networkcfg
 
 // AgentYAML is a representation of agent section in YAML infrastructure file
 type AgentYAML struct {

@@ -2,8 +2,8 @@ package simulation
 
 import (
 	"github.com/ffloyd/evergrid-go/simulation/agent"
-	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 	"github.com/ffloyd/evergrid-go/simulation/network"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 	"github.com/ffloyd/evergrid-go/simulation/ticker"
 
 	log "github.com/Sirupsen/logrus"
@@ -11,7 +11,7 @@ import (
 
 // Simulation represents whole simulation environment
 type Simulation struct {
-	infrastructureConfig *infrastructure.Config
+	infrastructureConfig *networkcfg.Config
 
 	ticker  *ticker.Ticker
 	network *network.Network
@@ -22,7 +22,7 @@ type Simulation struct {
 // New generates new simulation environment
 func New(infrastructureFile string) *Simulation {
 	sim := &Simulation{
-		infrastructureConfig: infrastructure.LoadYAML(infrastructureFile).Parse(),
+		infrastructureConfig: networkcfg.LoadYAML(infrastructureFile).Parse(),
 		agents:               agent.NewEnviron(),
 	}
 
@@ -41,7 +41,7 @@ func New(infrastructureFile string) *Simulation {
 	return sim
 }
 
-func (sim *Simulation) addAgent(agentConfig *infrastructure.Agent) {
+func (sim *Simulation) addAgent(agentConfig *networkcfg.Agent) {
 	switch agentConfig.Type {
 	case "dummy":
 		agent.NewDummy(agentConfig, sim.network, sim.agents)

@@ -2,8 +2,8 @@ package agent
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 	"github.com/ffloyd/evergrid-go/simulation/network"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
 
 // ControlUnit is a representation of control unit app
@@ -14,7 +14,7 @@ type ControlUnit struct {
 }
 
 // NewControlUnit creates a new control unit
-func NewControlUnit(config *infrastructure.Agent, net *network.Network, env *Environ) *ControlUnit {
+func NewControlUnit(config *networkcfg.Agent, net *network.Network, env *Environ) *ControlUnit {
 	unit := &ControlUnit{
 		Base: *NewBase(config, net, env),
 	}

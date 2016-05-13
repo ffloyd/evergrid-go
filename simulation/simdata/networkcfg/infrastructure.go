@@ -1,4 +1,4 @@
-package infrastructure
+package networkcfg
 
 import (
 	"io/ioutil"

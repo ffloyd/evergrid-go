@@ -1,4 +1,4 @@
-package infrastructure
+package networkcfg
 
 // SegmentYAML is a representation of network segment section in YAML infrastructure file
 type SegmentYAML struct {

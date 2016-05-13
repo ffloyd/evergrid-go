@@ -1,4 +1,4 @@
-package infrastructure
+package networkcfg
 
 // NodeYAML is a representation of network node section in YAML infrastructure file
 type NodeYAML struct {

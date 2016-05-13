@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
 
 // Node represents particular machine
@@ -14,7 +14,7 @@ type Node struct {
 	agents  map[string]Agent
 }
 
-func newNode(config *infrastructure.Node, parent *Segment) *Node {
+func newNode(config *networkcfg.Node, parent *Segment) *Node {
 	node := &Node{
 		name:    config.Name,
 		segment: parent,

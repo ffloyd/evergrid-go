@@ -2,7 +2,7 @@ package network
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
 
 // Segment represents a local connected scope of machines. As example - if they are part of same DigitalOcean region.
@@ -15,7 +15,7 @@ type Segment struct {
 	nodes map[string]*Node
 }
 
-func newSegment(config *infrastructure.Segment, parent *Network) *Segment {
+func newSegment(config *networkcfg.Segment, parent *Network) *Segment {
 	segment := &Segment{
 		name: config.Name,
 		innerBandwith: Bandwith{

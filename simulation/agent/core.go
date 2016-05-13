@@ -2,8 +2,8 @@ package agent
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/config/infrastructure"
 	"github.com/ffloyd/evergrid-go/simulation/network"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
 
 // Core represents a source of requests to system
@@ -13,7 +13,7 @@ type Core struct {
 }
 
 // NewCore creates a new core agent
-func NewCore(config *infrastructure.Agent, net *network.Network, env *Environ) *Core {
+func NewCore(config *networkcfg.Agent, net *network.Network, env *Environ) *Core {
 	core := &Core{
 		Base: *NewBase(config, net, env),
 	}
