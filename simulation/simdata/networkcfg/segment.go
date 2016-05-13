@@ -3,8 +3,8 @@ package networkcfg
 // SegmentCfgYAML is a representation of network segment section in YAML infrastructure file
 type SegmentCfgYAML struct {
 	Name          string
-	InnerBandwith [2]int
-	OuterBandwith [2]int
+	InnerBandwith []int `yaml:"inner_bandwith,flow"`
+	OuterBandwith []int `yaml:"outer_bandwith,flow"`
 	Nodes         []NodeCfgYAML
 }
 
@@ -24,11 +24,14 @@ type SegmentCfg struct {
 // all validations must be performed on this stage
 func (segmentYAML SegmentCfgYAML) Parse(parent *NetworkCfg) *SegmentCfg {
 	segment := &SegmentCfg{
-		Name:          segmentYAML.Name,
-		InnerBandwith: segmentYAML.InnerBandwith,
-		OuterBandwith: segmentYAML.OuterBandwith,
-		Network:       parent,
+		Name:    segmentYAML.Name,
+		Network: parent,
 	}
+
+	segment.InnerBandwith[0] = segmentYAML.InnerBandwith[0]
+	segment.InnerBandwith[1] = segmentYAML.InnerBandwith[1]
+	segment.OuterBandwith[0] = segmentYAML.OuterBandwith[0]
+	segment.OuterBandwith[1] = segmentYAML.OuterBandwith[1]
 
 	nodes, agentsCount := make([]*NodeCfg, len(segmentYAML.Nodes)), 0
 	for i, nodeYAML := range segmentYAML.Nodes {

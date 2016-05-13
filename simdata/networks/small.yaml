@@ -13,8 +13,8 @@ segments:
             type: core
   -
     name: Segment A
-    innerBandwith: [100, 100]
-    outerBandwith: [50, 50]
+    inner_bandwith: [100, 100]
+    outer_bandwith: [50, 50]
     nodes:
       -
         name: Control Node A
@@ -42,8 +42,8 @@ segments:
             type: worker
   -
     name: Segment B
-    innerBandwith: [100, 100]
-    outerBandwith: [50, 50]
+    inner_bandwith: [100, 100]
+    outer_bandwith: [50, 50]
     nodes:
       -
         name: Control Node B
