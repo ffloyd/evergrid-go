@@ -1,0 +1,8 @@
+datasets:
+    -
+        name: Dataset 1
+        size: 1024
+processors:
+    -
+        name: Processor 1
+        gflopsPerMb: 512

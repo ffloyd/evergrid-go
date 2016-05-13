@@ -6,19 +6,22 @@ import (
 	"path/filepath"
 
 	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
+	"github.com/ffloyd/evergrid-go/simulation/simdata/workloadcfg"
 	"gopkg.in/yaml.v2"
 )
 
 // YAML is a representation of simdata yaml file
 type YAML struct {
-	Name    string
-	Network string
+	Name     string
+	Network  string
+	Workload string
 }
 
 // SimData represents all simulation data config needed to experiment
 type SimData struct {
-	Name    string
-	Network *networkcfg.NetworkCfg
+	Name     string
+	Network  *networkcfg.NetworkCfg
+	Workload *workloadcfg.WorkloadCfg
 }
 
 // Load for loading config from YAML to simdata.Config
@@ -43,6 +46,9 @@ func Load(simdataFilename string) *SimData {
 
 	networkFilename := filepath.Join(basePath, "networks", configYAML.Network)
 	simdata.Network = networkcfg.Load(networkFilename)
+
+	workloadFilename := filepath.Join(basePath, "workloads", configYAML.Workload)
+	simdata.Workload = workloadcfg.Load(workloadFilename)
 
 	return simdata
 }
