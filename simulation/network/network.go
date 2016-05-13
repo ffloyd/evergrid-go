@@ -14,7 +14,7 @@ type Network struct {
 }
 
 // New creates a new network basing on config
-func New(config *networkcfg.Network) *Network {
+func New(config *networkcfg.NetworkCfg) *Network {
 	network := &Network{
 		name:     config.Name,
 		segments: make(map[string]*Segment),

@@ -15,7 +15,7 @@ type Segment struct {
 	nodes map[string]*Node
 }
 
-func newSegment(config *networkcfg.Segment, parent *Network) *Segment {
+func newSegment(config *networkcfg.SegmentCfg, parent *Network) *Segment {
 	segment := &Segment{
 		name: config.Name,
 		innerBandwith: Bandwith{

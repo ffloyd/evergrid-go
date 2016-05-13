@@ -12,7 +12,7 @@ type Dummy struct {
 }
 
 // NewDummy creates new dummy agent
-func NewDummy(config *networkcfg.Agent, net *network.Network, env *Environ) *Dummy {
+func NewDummy(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *Dummy {
 	dummy := &Dummy{
 		Base: *NewBase(config, net, env),
 	}

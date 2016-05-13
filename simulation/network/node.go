@@ -14,7 +14,7 @@ type Node struct {
 	agents  map[string]Agent
 }
 
-func newNode(config *networkcfg.Node, parent *Segment) *Node {
+func newNode(config *networkcfg.NodeCfg, parent *Segment) *Node {
 	node := &Node{
 		name:    config.Name,
 		segment: parent,

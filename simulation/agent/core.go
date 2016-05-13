@@ -13,7 +13,7 @@ type Core struct {
 }
 
 // NewCore creates a new core agent
-func NewCore(config *networkcfg.Agent, net *network.Network, env *Environ) *Core {
+func NewCore(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *Core {
 	core := &Core{
 		Base: *NewBase(config, net, env),
 	}

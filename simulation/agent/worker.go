@@ -12,7 +12,7 @@ type Worker struct {
 }
 
 // NewWorker creates new worker agent
-func NewWorker(config *networkcfg.Agent, net *network.Network, env *Environ) *Worker {
+func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *Worker {
 	worker := &Worker{
 		Base: *NewBase(config, net, env),
 	}

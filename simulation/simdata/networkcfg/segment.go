@@ -1,42 +1,42 @@
 package networkcfg
 
-// SegmentYAML is a representation of network segment section in YAML infrastructure file
-type SegmentYAML struct {
+// SegmentCfgYAML is a representation of network segment section in YAML infrastructure file
+type SegmentCfgYAML struct {
 	Name          string
 	InnerBandwith [2]int
 	OuterBandwith [2]int
-	Nodes         []NodeYAML
+	Nodes         []NodeCfgYAML
 }
 
-// Segment is a struct needed to create new network.Segment instance
-type Segment struct {
+// SegmentCfg is a struct needed to create new network.Segment instance
+type SegmentCfg struct {
 	Name          string
 	InnerBandwith [2]int
 	OuterBandwith [2]int
-	Nodes         []*Node
+	Nodes         []*NodeCfg
 
-	Network *Network // parent
+	Network *NetworkCfg // parent
 
-	Agents []*Agent // all agents inside segment
+	Agents []*AgentCfg // all agents inside segment
 }
 
 // Parse transform unmarshalled config to internal config representation
 // all validations must be performed on this stage
-func (segmentYAML SegmentYAML) Parse(parent *Network) *Segment {
-	segment := &Segment{
+func (segmentYAML SegmentCfgYAML) Parse(parent *NetworkCfg) *SegmentCfg {
+	segment := &SegmentCfg{
 		Name:          segmentYAML.Name,
 		InnerBandwith: segmentYAML.InnerBandwith,
 		OuterBandwith: segmentYAML.OuterBandwith,
 		Network:       parent,
 	}
 
-	nodes, agentsCount := make([]*Node, len(segmentYAML.Nodes)), 0
+	nodes, agentsCount := make([]*NodeCfg, len(segmentYAML.Nodes)), 0
 	for i, nodeYAML := range segmentYAML.Nodes {
 		nodes[i] = nodeYAML.Parse(segment)
 		agentsCount += len(nodes[i].Agents)
 	}
 
-	agents := make([]*Agent, 0, agentsCount)
+	agents := make([]*AgentCfg, 0, agentsCount)
 	for _, node := range nodes {
 		agents = append(agents, node.Agents...)
 	}

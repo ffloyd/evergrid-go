@@ -14,7 +14,7 @@ type ControlUnit struct {
 }
 
 // NewControlUnit creates a new control unit
-func NewControlUnit(config *networkcfg.Agent, net *network.Network, env *Environ) *ControlUnit {
+func NewControlUnit(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *ControlUnit {
 	unit := &ControlUnit{
 		Base: *NewBase(config, net, env),
 	}

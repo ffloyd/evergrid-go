@@ -1,28 +1,28 @@
 package networkcfg
 
-// NodeYAML is a representation of network node section in YAML infrastructure file
-type NodeYAML struct {
+// NodeCfgYAML is a representation of network node section in YAML infrastructure file
+type NodeCfgYAML struct {
 	Name   string
-	Agents []AgentYAML
+	Agents []AgentCfgYAML
 }
 
-// Node is a struct needed to create new network.Node instance
-type Node struct {
+// NodeCfg is a struct needed to create new network.Node instance
+type NodeCfg struct {
 	Name   string
-	Agents []*Agent
+	Agents []*AgentCfg
 
-	Segment *Segment // parent
+	Segment *SegmentCfg // parent
 }
 
 // Parse transform unmarshalled config to internal config representation
 // all validations must be performed on this stage
-func (nodeYAML NodeYAML) Parse(parent *Segment) *Node {
-	node := &Node{
+func (nodeYAML NodeCfgYAML) Parse(parent *SegmentCfg) *NodeCfg {
+	node := &NodeCfg{
 		Name:    nodeYAML.Name,
 		Segment: parent,
 	}
 
-	agents := make([]*Agent, len(nodeYAML.Agents))
+	agents := make([]*AgentCfg, len(nodeYAML.Agents))
 	for i, agentYAML := range nodeYAML.Agents {
 		agents[i] = agentYAML.Parse(node)
 	}

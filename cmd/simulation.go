@@ -10,13 +10,13 @@ import (
 
 // simulationCmd represents the simulation command
 var simulationCmd = &cobra.Command{
-	Use:       "simulation INFRASTRUCTURE",
+	Use:       "simulation SIMDATA",
 	Aliases:   []string{"sim", "s"},
 	ValidArgs: []string{"INFRASTRUCTURE"},
 	Short:     "Starts simulation with given options",
 	Long: `Starts simulation with given infracstructure.
 
-INFRASTRUCTURE argument is a name (without path or extension) of YAML file with infracstructure config.`,
+SIMDATA argument is a name of YAML file with simdata config.`,
 	Run: func(cmd *cobra.Command, args []string) {
 		if len(args) < 1 {
 			fmt.Println("INFRASTRUCTURE argument missing")
