@@ -34,6 +34,9 @@ func (ticker *Ticker) Run() {
 		for _, chans := range ticker.agentChans {
 			chans.Ticks <- ticker.currentTick
 		}
+		for _, chans := range ticker.agentChans {
+			<-chans.Ticks
+		}
 
 		// wait for ready status from all agents
 		for _, chans := range ticker.agentChans {

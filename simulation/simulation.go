@@ -22,6 +22,8 @@ type Simulation struct {
 
 // New generates new simulation environment
 func New(simdataFilename string) *Simulation {
+	// log.SetLevel(log.DebugLevel)
+
 	sim := &Simulation{
 		simData: simdata.Load(simdataFilename),
 		agents:  agent.NewEnviron(),
@@ -51,7 +53,7 @@ func (sim *Simulation) addAgent(agentConfig *networkcfg.AgentCfg) {
 	case "control_unit":
 		agent.NewControlUnit(agentConfig, sim.network, sim.agents)
 	case "core":
-		agent.NewCore(agentConfig, sim.network, sim.agents)
+		agent.NewCore(agentConfig, sim.network, sim.agents, sim.simData.Workload)
 	default:
 		log.Fatalf("Unknown agent type: %s", agentConfig.Type)
 	}

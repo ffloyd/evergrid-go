@@ -1,6 +1,8 @@
 package agent
 
 import (
+	log "github.com/Sirupsen/logrus"
+
 	"github.com/ffloyd/evergrid-go/simulation/network"
 	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
@@ -27,6 +29,14 @@ func (agent Base) Name() string {
 // Node needed for agent.Agent interface
 func (agent Base) Node() *network.Node {
 	return agent.node
+}
+
+func (agent Base) onNewTick(tick int) {
+	log.WithFields(log.Fields{
+		"tick":  tick,
+		"agent": agent,
+	}).Debug("received tick")
+	agent.tickerChans.Ticks <- tick // confirmation
 }
 
 // NewBase is common initialization part all agents

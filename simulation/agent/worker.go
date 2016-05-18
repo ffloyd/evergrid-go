@@ -27,10 +27,7 @@ func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) 
 
 func (worker Worker) run() {
 	for {
-		log.WithFields(log.Fields{
-			"tick":  <-worker.tickerChans.Ticks,
-			"agent": worker,
-		}).Debug("received tick")
+		worker.onNewTick(<-worker.tickerChans.Ticks)
 		worker.tickerChans.Ready <- true
 	}
 }

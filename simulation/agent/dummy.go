@@ -27,10 +27,7 @@ func NewDummy(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *
 
 func (agent Dummy) run() {
 	for {
-		log.WithFields(log.Fields{
-			"tick":  <-agent.tickerChans.Ticks,
-			"agent": agent,
-		}).Debug("received tick")
+		agent.onNewTick(<-agent.tickerChans.Ticks)
 		agent.tickerChans.Ready <- true
 	}
 }
