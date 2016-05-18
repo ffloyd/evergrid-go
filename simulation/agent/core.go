@@ -45,14 +45,13 @@ func (core Core) getControlUnit() *ControlUnit {
 
 func (core Core) run() {
 	for {
-		tick := <-core.tickerChans.Ticks
-		core.onNewTick(tick)
+		core.startTick()
 
-		for _, request := range core.workload.Requests[tick] {
+		for _, request := range core.workload.Requests[core.tick] {
 			controlUnit := core.getControlUnit()
 			controlUnit.incomingRequests <- request
 			log.WithFields(log.Fields{
-				"tick":         tick,
+				"tick":         core.tick,
 				"core":         core,
 				"control unit": controlUnit,
 				"type":         request.Type,
@@ -60,11 +59,10 @@ func (core Core) run() {
 		}
 
 		for _, controlUnit := range core.env.ControlUnits {
-			log.WithField("control unit", controlUnit).Debug("Send noMoreRequests to control unit")
 			controlUnit.noMoreRequests <- true
 		}
 
-		core.tickerChans.Ready <- true
+		core.finishTick()
 	}
 }
 

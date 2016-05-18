@@ -34,11 +34,13 @@ func (ticker *Ticker) Run() {
 		for _, chans := range ticker.agentChans {
 			chans.Ticks <- ticker.currentTick
 		}
+
+		// tick start sync
 		for _, chans := range ticker.agentChans {
-			<-chans.Ticks
+			_ = <-chans.Ready
 		}
 
-		// wait for ready status from all agents
+		// tick end sync
 		for _, chans := range ticker.agentChans {
 			_ = <-chans.Ready
 		}

@@ -27,8 +27,8 @@ func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) 
 
 func (worker Worker) run() {
 	for {
-		worker.onNewTick(<-worker.tickerChans.Ticks)
-		worker.tickerChans.Ready <- true
+		worker.startTick()
+		worker.finishTick()
 	}
 }
 

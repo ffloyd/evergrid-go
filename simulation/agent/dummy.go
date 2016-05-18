@@ -27,8 +27,8 @@ func NewDummy(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *
 
 func (agent Dummy) run() {
 	for {
-		agent.onNewTick(<-agent.tickerChans.Ticks)
-		agent.tickerChans.Ready <- true
+		agent.startTick()
+		agent.finishTick()
 	}
 }
 

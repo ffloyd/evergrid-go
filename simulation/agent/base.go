@@ -14,6 +14,7 @@ type Base struct {
 	node        *network.Node
 	tickerChans *TickerChans
 	env         *Environ
+	tick        int // current tick
 }
 
 // String for implement Stringer interface
@@ -31,12 +32,21 @@ func (agent Base) Node() *network.Node {
 	return agent.node
 }
 
-func (agent Base) onNewTick(tick int) {
+func (agent *Base) startTick() {
+	agent.tick = <-agent.tickerChans.Ticks
 	log.WithFields(log.Fields{
-		"tick":  tick,
+		"tick":  agent.tick,
 		"agent": agent,
-	}).Debug("received tick")
-	agent.tickerChans.Ticks <- tick // confirmation
+	}).Debug("agent ready for tick")
+	agent.tickerChans.Ready <- true // tick begin sync
+}
+
+func (agent Base) finishTick() {
+	log.WithFields(log.Fields{
+		"tick":  agent.tick,
+		"agent": agent,
+	}).Debug("agent finished tick")
+	agent.tickerChans.Ready <- true // tick end sync
 }
 
 // NewBase is common initialization part all agents

@@ -38,8 +38,7 @@ func (unit ControlUnit) processRequest(request *workloadcfg.RequestCfg) {
 
 func (unit ControlUnit) run() {
 	for {
-		tick := <-unit.tickerChans.Ticks
-		unit.onNewTick(tick)
+		unit.startTick()
 
 	SelectLoop:
 		for {
@@ -47,12 +46,12 @@ func (unit ControlUnit) run() {
 			case request := <-unit.incomingRequests:
 				log.WithFields(log.Fields{
 					"control_unit": unit,
-					"tick":         tick,
+					"tick":         unit.tick,
 					"type":         request.Type,
 				}).Info("Control unit received request")
 				unit.processRequest(request)
 			case <-unit.noMoreRequests:
-				unit.tickerChans.Ready <- true
+				unit.finishTick()
 				break SelectLoop
 			}
 		}
