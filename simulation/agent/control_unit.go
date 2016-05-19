@@ -2,6 +2,7 @@ package agent
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/ffloyd/evergrid-go/scheduler"
 	"github.com/ffloyd/evergrid-go/simulation/network"
 	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 	"github.com/ffloyd/evergrid-go/simulation/simdata/workloadcfg"
@@ -14,6 +15,8 @@ type ControlUnit struct {
 	incomingRequests chan *workloadcfg.RequestCfg
 	noMoreRequests   chan bool
 	workers          []*Worker
+
+	scheduler *scheduler.Scheduler
 }
 
 // NewControlUnit creates a new control unit
@@ -36,7 +39,26 @@ func (unit ControlUnit) processRequest(request *workloadcfg.RequestCfg) {
 
 }
 
+func (unit *ControlUnit) startScheduler() {
+	log.WithFields(log.Fields{
+		"control_unit": unit,
+		"algorithm":    "FIFO",
+	}).Info("Starting scheduler")
+
+	unit.scheduler = scheduler.New(scheduler.FIFO)
+	go unit.scheduler.Run()
+
+	<-unit.scheduler.Chans.Alive
+
+	log.WithFields(log.Fields{
+		"control_unit": unit,
+		"algorithm":    "FIFO",
+	}).Info("Scheduler started")
+}
+
 func (unit ControlUnit) run() {
+	unit.startScheduler()
+
 	for {
 		unit.startTick()
 
