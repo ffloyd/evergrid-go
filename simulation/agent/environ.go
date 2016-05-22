@@ -8,6 +8,8 @@ type Environ struct {
 	Workers      map[string]*Worker
 	ControlUnits map[string]*ControlUnit
 	Cores        map[string]*Core
+
+	leaderControlUnit *ControlUnit
 }
 
 // NewEnviron is a simple initializer
@@ -57,4 +59,18 @@ func (env Environ) SyncGroup() ticker.SyncGroup {
 		result[i] = agent.Run()
 	}
 	return result
+}
+
+// LeaderControlUnit returns a current leader between control units
+func (env *Environ) LeaderControlUnit() *ControlUnit {
+	if env.leaderControlUnit == nil {
+		var firstCU *ControlUnit
+		for _, cu := range env.ControlUnits {
+			firstCU = cu
+			break
+		}
+		env.leaderControlUnit = firstCU
+	}
+
+	return env.leaderControlUnit
 }
