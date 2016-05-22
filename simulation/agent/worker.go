@@ -19,21 +19,22 @@ func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) 
 	env.Workers[worker.Name()] = worker
 
 	log.WithFields(log.Fields{
-		"name": worker.Name(),
-		"node": worker.Node(),
+		"agent": worker.Name(),
+		"node":  worker.Node(),
 	}).Info("Worker agent initialized")
 	return worker
 }
 
 func (worker Worker) run() {
 	for {
-		worker.startTick()
-		worker.finishTick()
+		worker.sync.toReady()
+		worker.sync.toIdle()
+		<-worker.sync.toDoneCallback()
 	}
 }
 
 // Run is implementation of agent.Runner iface
-func (worker Worker) Run() *TickerChans {
+func (worker Worker) Run() *Synchronizer {
 	go worker.run()
-	return worker.tickerChans
+	return worker.sync
 }

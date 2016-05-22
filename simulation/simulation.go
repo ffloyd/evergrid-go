@@ -35,7 +35,7 @@ func New(simdataFilename string) *Simulation {
 		sim.addAgent(agentConfig)
 	}
 
-	sim.ticker = ticker.New(sim.agents.AllAgents())
+	sim.ticker = ticker.New(sim.agents.SyncGroup())
 
 	log.WithFields(log.Fields{
 		"name": sim.simData.Name,

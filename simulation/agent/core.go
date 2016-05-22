@@ -25,8 +25,8 @@ func NewCore(config *networkcfg.AgentCfg, net *network.Network, env *Environ, wo
 	env.Cores[core.Name()] = core
 
 	log.WithFields(log.Fields{
-		"name": core.Name(),
-		"node": core.Node(),
+		"agent": core.Name(),
+		"node":  core.Node(),
 	}).Info("Core agent initialized")
 	return core
 }
@@ -45,29 +45,28 @@ func (core Core) getControlUnit() *ControlUnit {
 
 func (core Core) run() {
 	for {
-		core.startTick()
+		core.sync.toReady()
+		core.sync.toWorking()
 
-		for _, request := range core.workload.Requests[core.tick] {
+		for _, request := range core.workload.Requests[core.sync.tick] {
 			controlUnit := core.getControlUnit()
 			controlUnit.incomingRequests <- request
+			<-controlUnit.requestConfirmation
 			log.WithFields(log.Fields{
-				"tick":         core.tick,
-				"core":         core,
+				"tick":         core.sync.tick,
+				"agent":        core,
 				"control unit": controlUnit,
 				"type":         request.Type,
-			}).Info("Core sent request to control unit")
+			}).Info("Core sent request to Control Unit")
 		}
 
-		for _, controlUnit := range core.env.ControlUnits {
-			controlUnit.noMoreRequests <- true
-		}
-
-		core.finishTick()
+		core.sync.toIdle()
+		<-core.sync.toDoneCallback()
 	}
 }
 
 // Run is implementation of agent.Runner iface
-func (core Core) Run() *TickerChans {
+func (core Core) Run() *Synchronizer {
 	go core.run()
-	return core.tickerChans
+	return core.sync
 }

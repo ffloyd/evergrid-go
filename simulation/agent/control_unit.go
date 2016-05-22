@@ -12,9 +12,9 @@ import (
 type ControlUnit struct {
 	Base
 
-	incomingRequests chan *workloadcfg.RequestCfg
-	noMoreRequests   chan bool
-	workers          []*Worker
+	incomingRequests    chan *workloadcfg.RequestCfg
+	requestConfirmation chan bool
+	workers             []*Worker
 
 	scheduler *scheduler.Scheduler
 }
@@ -22,28 +22,28 @@ type ControlUnit struct {
 // NewControlUnit creates a new control unit
 func NewControlUnit(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *ControlUnit {
 	unit := &ControlUnit{
-		Base:             *NewBase(config, net, env),
-		incomingRequests: make(chan *workloadcfg.RequestCfg),
-		noMoreRequests:   make(chan bool),
+		Base:                *NewBase(config, net, env),
+		incomingRequests:    make(chan *workloadcfg.RequestCfg),
+		requestConfirmation: make(chan bool),
 	}
 	env.ControlUnits[unit.Name()] = unit
 
 	log.WithFields(log.Fields{
-		"name": unit.Name(),
-		"node": unit.Node(),
+		"agent": unit.Name(),
+		"node":  unit.Node(),
 	}).Info("Control Unit agent initialized")
 	return unit
 }
 
-func (unit ControlUnit) processRequest(request *workloadcfg.RequestCfg) {
+func (unit *ControlUnit) processRequest(request *workloadcfg.RequestCfg) {
 
 }
 
 func (unit *ControlUnit) startScheduler() {
 	log.WithFields(log.Fields{
-		"control_unit": unit,
-		"algorithm":    "FIFO",
-	}).Info("Starting scheduler")
+		"agent":     unit,
+		"algorithm": "FIFO",
+	}).Info("Starting scheduler on Control Unit")
 
 	unit.scheduler = scheduler.New(scheduler.FIFO)
 	go unit.scheduler.Run()
@@ -51,29 +51,33 @@ func (unit *ControlUnit) startScheduler() {
 	<-unit.scheduler.Chans.Alive
 
 	log.WithFields(log.Fields{
-		"control_unit": unit,
-		"algorithm":    "FIFO",
-	}).Info("Scheduler started")
+		"agent":     unit,
+		"algorithm": "FIFO",
+	}).Info("Scheduler started on Control Unit")
 }
 
-func (unit ControlUnit) run() {
+func (unit *ControlUnit) run() {
 	unit.startScheduler()
 
 	for {
-		unit.startTick()
+		unit.sync.toReady()
+		unit.sync.toIdle()
+		doneCh := unit.sync.toDoneCallback()
 
 	SelectLoop:
 		for {
 			select {
 			case request := <-unit.incomingRequests:
+				unit.sync.toWorking()
 				log.WithFields(log.Fields{
-					"control_unit": unit,
-					"tick":         unit.tick,
-					"type":         request.Type,
+					"agent": unit,
+					"tick":  unit.sync.tick,
+					"type":  request.Type,
 				}).Info("Control unit received request")
+				unit.requestConfirmation <- true
 				unit.processRequest(request)
-			case <-unit.noMoreRequests:
-				unit.finishTick()
+				unit.sync.toIdle()
+			case <-doneCh:
 				break SelectLoop
 			}
 		}
@@ -81,7 +85,7 @@ func (unit ControlUnit) run() {
 }
 
 // Run is implementation of agent.Runner iface
-func (unit ControlUnit) Run() *TickerChans {
+func (unit *ControlUnit) Run() *Synchronizer {
 	go unit.run()
-	return unit.tickerChans
+	return unit.sync
 }

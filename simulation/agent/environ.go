@@ -1,5 +1,7 @@
 package agent
 
+import "github.com/ffloyd/evergrid-go/simulation/ticker"
+
 // Environ is a set of all agents in the system
 type Environ struct {
 	Dummies      map[string]*Dummy
@@ -45,4 +47,14 @@ func (env Environ) AllAgents() []Agent {
 	}
 
 	return agents
+}
+
+// SyncGroup return a ticker.SyncGroup with all agents inside
+func (env Environ) SyncGroup() ticker.SyncGroup {
+	agents := env.AllAgents()
+	result := make(ticker.SyncGroup, len(agents))
+	for i, agent := range agents {
+		result[i] = agent.Run()
+	}
+	return result
 }

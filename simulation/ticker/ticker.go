@@ -2,47 +2,66 @@ package ticker
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/agent"
 )
 
 // Ticker is a global timer like NetLogo's one
 type Ticker struct {
 	currentTick int
-	agentChans  []*agent.TickerChans
+
+	ticksChan     chan int
+	statusChan    chan SyncableStatus
+	startWorkChan chan bool
+	finisWorkChan chan bool
 }
 
 // New creates a new Ticker. Also it runs all agents because it essential for correct work of ticker.
-func New(agents []agent.Agent) *Ticker {
+func New(sync Syncable) *Ticker {
 	defer log.Info("New ticker initialized")
 
-	ticker := new(Ticker)
-
-	ticker.agentChans = make([]*agent.TickerChans, len(agents))
-	for i, agent := range agents {
-		ticker.agentChans[i] = agent.Run()
+	return &Ticker{
+		ticksChan:     sync.CreateTicksChan(),
+		statusChan:    sync.CreateStatusChan(),
+		startWorkChan: sync.CreateStartWorkChan(),
+		finisWorkChan: sync.CreateFinishWorkChan(),
 	}
-
-	return ticker
 }
 
 // Run starts ticker
 func (ticker *Ticker) Run() {
 	for {
-		// send new tick to all agents
+		// send new tick
 		ticker.currentTick++
-		log.WithField("tick", ticker.currentTick).Debug("new tick")
-		for _, chans := range ticker.agentChans {
-			chans.Ticks <- ticker.currentTick
-		}
+		log.WithField("tick", ticker.currentTick).Debug("Ticker: new tick")
+		ticker.ticksChan <- ticker.currentTick
 
-		// tick start sync
-		for _, chans := range ticker.agentChans {
-			_ = <-chans.Ready
+		// confirm receiving
+		readyStatus := <-ticker.statusChan
+		if readyStatus != StatusReady {
+			panic("Invalid status for syncable")
 		}
+		log.WithField("tick", ticker.currentTick).Debug("Ticker: all agents are ready")
 
-		// tick end sync
-		for _, chans := range ticker.agentChans {
-			_ = <-chans.Ready
+		// initiate work
+		ticker.startWorkChan <- true
+		log.WithField("tick", ticker.currentTick).Debug("Ticker: start agent's work")
+
+		// wait for Idle status
+		for {
+			status := <-ticker.statusChan
+			if status == StatusIdle {
+				break
+			}
 		}
+		log.WithField("tick", ticker.currentTick).Debug("Ticker: all agents became idle")
+
+		// stop work for this tick
+		ticker.finisWorkChan <- true
+
+		// confirm that work finished
+		doneStatus := <-ticker.statusChan
+		if doneStatus != StatusDone {
+			panic("Invalid status for syncable")
+		}
+		log.WithField("tick", ticker.currentTick).Debug("Ticker: all agents finish work")
 	}
 }

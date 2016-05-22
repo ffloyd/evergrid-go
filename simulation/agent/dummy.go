@@ -19,21 +19,22 @@ func NewDummy(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *
 	env.Dummies[dummy.Name()] = dummy
 
 	log.WithFields(log.Fields{
-		"name": dummy.Name(),
-		"node": dummy.Node(),
+		"agent": dummy.Name(),
+		"node":  dummy.Node(),
 	}).Info("Dummy agent initialized")
 	return dummy
 }
 
 func (agent Dummy) run() {
 	for {
-		agent.startTick()
-		agent.finishTick()
+		agent.sync.toReady()
+		agent.sync.toIdle()
+		<-agent.sync.toDoneCallback()
 	}
 }
 
 // Run is implementation of agent.Runner iface
-func (agent Dummy) Run() *TickerChans {
+func (agent Dummy) Run() *Synchronizer {
 	go agent.run()
-	return agent.tickerChans
+	return agent.sync
 }

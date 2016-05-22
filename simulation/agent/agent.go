@@ -10,6 +10,6 @@ import (
 type Agent interface {
 	fmt.Stringer
 	network.Agent
-	Run() *TickerChans
+	Run() *Synchronizer
 	Node() *network.Node
 }
