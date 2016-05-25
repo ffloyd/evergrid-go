@@ -10,13 +10,15 @@ const (
 
 // Scheduler is just a scheduler
 type Scheduler struct {
+	ID        string
 	algorithm Algorithm
 	Chans     *Chans
 }
 
 // New creates new scheduler which used specified algorithm
-func New(alg Algorithm) *Scheduler {
+func New(alg Algorithm, agentName string) *Scheduler {
 	sched := &Scheduler{
+		ID:        agentName,
 		algorithm: alg,
 		Chans:     newChans(),
 	}

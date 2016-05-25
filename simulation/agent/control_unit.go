@@ -17,6 +17,7 @@ type ControlUnit struct {
 	workers             []*Worker
 
 	scheduler *scheduler.Scheduler
+	monitor   *Monitor
 }
 
 // NewControlUnit creates a new control unit
@@ -36,7 +37,38 @@ func NewControlUnit(config *networkcfg.AgentCfg, net *network.Network, env *Envi
 }
 
 func (unit *ControlUnit) processRequest(request *workloadcfg.RequestCfg) {
+	switch request.Type {
+	case "upload_dataset":
+		unit.processDataUpload(request)
+	default:
+		log.Fatalf("Unknown request type: %s", request.Type)
+	}
+}
 
+func (unit *ControlUnit) processDataUpload(request *workloadcfg.RequestCfg) {
+	schedReq := &scheduler.ReqUploadDataset{
+		DatasetID: request.Dataset.Name,
+		Response:  make(chan *scheduler.RespUploadDataset),
+	}
+
+	unit.scheduler.Chans.Requests.UploadDataset <- schedReq
+	response := <-schedReq.Response
+
+	if response.DelegateToLeader {
+		leader := unit.env.LeaderControlUnit()
+		log.WithFields(log.Fields{
+			"agent":   unit,
+			"dataset": request.Dataset.Name,
+			"leader":  leader,
+		}).Info("Redirecting upload dataset request to leader")
+		leader.incomingRequests <- request
+		<-leader.requestConfirmation
+	} else {
+		log.WithFields(log.Fields{
+			"agent":   unit,
+			"dataset": request.Dataset.Name,
+		}).Info("Upload dataset request processed")
+	}
 }
 
 func (unit *ControlUnit) startScheduler() {
@@ -45,7 +77,8 @@ func (unit *ControlUnit) startScheduler() {
 		"algorithm": "FIFO",
 	}).Info("Starting scheduler on Control Unit")
 
-	unit.scheduler = scheduler.New(scheduler.FIFO)
+	unit.scheduler = scheduler.New(scheduler.FIFO, unit.Name())
+	unit.monitor = startMonitor(unit.scheduler, unit.env, unit.Name())
 	go unit.scheduler.Run()
 
 	<-unit.scheduler.Chans.Alive

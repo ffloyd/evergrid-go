@@ -50,14 +50,14 @@ func (core Core) run() {
 
 		for _, request := range core.workload.Requests[core.sync.tick] {
 			controlUnit := core.getControlUnit()
-			controlUnit.incomingRequests <- request
-			<-controlUnit.requestConfirmation
 			log.WithFields(log.Fields{
 				"tick":         core.sync.tick,
 				"agent":        core,
 				"control unit": controlUnit,
 				"type":         request.Type,
-			}).Info("Core sent request to Control Unit")
+			}).Info("Core seding request to Control Unit")
+			controlUnit.incomingRequests <- request
+			<-controlUnit.requestConfirmation
 		}
 
 		core.sync.toIdle()
