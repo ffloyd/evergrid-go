@@ -46,28 +46,33 @@ func (unit *ControlUnit) processRequest(request *workloadcfg.RequestCfg) {
 }
 
 func (unit *ControlUnit) processDataUpload(request *workloadcfg.RequestCfg) {
-	schedReq := &scheduler.ReqUploadDataset{
-		DatasetID: request.Dataset.Name,
-		Response:  make(chan *scheduler.RespUploadDataset),
-	}
+	schedReq := scheduler.NewReqUploadDataset(request.Dataset.Name)
 
 	unit.scheduler.Chans.Requests.UploadDataset <- schedReq
-	response := <-schedReq.Response
+	response := schedReq.Response
 
-	if response.DelegateToLeader {
-		leader := unit.env.LeaderControlUnit()
-		log.WithFields(log.Fields{
-			"agent":   unit,
-			"dataset": request.Dataset.Name,
-			"leader":  leader,
-		}).Info("Redirecting upload dataset request to leader")
-		leader.incomingRequests <- request
-		<-leader.requestConfirmation
-	} else {
-		log.WithFields(log.Fields{
-			"agent":   unit,
-			"dataset": request.Dataset.Name,
-		}).Info("Upload dataset request processed")
+SelectLoop:
+	for {
+		select {
+		case <-response.Done:
+			log.WithFields(log.Fields{
+				"agent":   unit,
+				"dataset": request.Dataset.Name,
+			}).Info("Upload dataset request processed")
+			break SelectLoop
+		case <-response.DelegateToLeader:
+			leader := unit.env.LeaderControlUnit()
+			log.WithFields(log.Fields{
+				"agent":   unit,
+				"dataset": request.Dataset.Name,
+				"leader":  leader,
+			}).Info("Redirecting upload dataset request to leader")
+			leader.incomingRequests <- request
+			<-leader.requestConfirmation
+			break SelectLoop
+		case resp := <-response.UploadDatasetToWorker:
+			log.Info(resp)
+		}
 	}
 }
 

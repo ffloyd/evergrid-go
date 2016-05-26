@@ -36,15 +36,3 @@ func newSensorChans() *SensorChans {
 		IsLeader: make(chan bool),
 	}
 }
-
-// ReqUploadDataset - defines request to upload new dataset
-type ReqUploadDataset struct {
-	DatasetID string
-	Response  chan *RespUploadDataset
-}
-
-// RespUploadDataset - response for UploadDataset action
-type RespUploadDataset struct {
-	DelegateToLeader bool
-	UploadToWorkers  []string // contain worker names
-}

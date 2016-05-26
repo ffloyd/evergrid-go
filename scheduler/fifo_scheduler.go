@@ -19,17 +19,12 @@ func (sched *fifoScheduler) run() {
 				log.WithFields(log.Fields{
 					"ID": sched.base.ID,
 				}).Info("FIFO scheduler: processing upload_dataset request")
-				udReqest.Response <- &RespUploadDataset{
-					DelegateToLeader: false,
-					UploadToWorkers:  make([]string, 0),
-				}
+				udReqest.Response.Done <- RespDone{}
 			} else {
 				log.WithFields(log.Fields{
 					"ID": sched.base.ID,
 				}).Info("FIFO scheduler: redirect upload dataset request to leader")
-				udReqest.Response <- &RespUploadDataset{
-					DelegateToLeader: true,
-				}
+				udReqest.Response.DelegateToLeader <- RespDelegateToLeader{}
 			}
 		}
 	}
