@@ -46,16 +46,16 @@ func New(simdataFilename string) *Simulation {
 
 func (sim *Simulation) addAgent(agentConfig *networkcfg.AgentCfg) {
 	switch agentConfig.Type {
-	case "dummy":
+	case networkcfg.AgentDummy:
 		agent.NewDummy(agentConfig, sim.network, sim.agents)
-	case "worker":
+	case networkcfg.AgentWorker:
 		agent.NewWorker(agentConfig, sim.network, sim.agents)
-	case "control_unit":
+	case networkcfg.AgentControlUnit:
 		agent.NewControlUnit(agentConfig, sim.network, sim.agents)
-	case "core":
+	case networkcfg.AgentCore:
 		agent.NewCore(agentConfig, sim.network, sim.agents, sim.simData.Workload)
 	default:
-		log.Fatalf("Unknown agent type: %s", agentConfig.Type)
+		log.Fatalf("Unknown agent type")
 	}
 }
 
