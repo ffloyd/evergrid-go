@@ -1,9 +1,6 @@
 package scheduler
 
-import (
-	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/global/types"
-)
+import log "github.com/Sirupsen/logrus"
 
 type fifoScheduler struct {
 	base *Scheduler
@@ -15,22 +12,24 @@ func (sched *fifoScheduler) run() {
 		select {
 		case chans.Alive <- true:
 		case udReqest := <-chans.Requests.UploadDataset:
-			amILeader := <-chans.Sensors.IsLeader
-			if amILeader {
-				log.WithFields(log.Fields{
-					"ID": sched.base.ID,
-				}).Info("FIFO scheduler: processing upload_dataset request")
-				sched.processRequest(<-<-chans.Sensors.GlobalState)
-				udReqest.Response.Done <- RespDone{}
-			} else {
-				log.WithFields(log.Fields{
-					"ID": sched.base.ID,
-				}).Info("FIFO scheduler: redirect upload dataset request to leader")
-				udReqest.Response.DelegateToLeader <- RespDelegateToLeader{}
-			}
+			sched.processUploadDataset(udReqest)
 		}
 	}
 }
 
-func (sched *fifoScheduler) processRequest(state *types.GlobalState) {
+func (sched *fifoScheduler) processUploadDataset(request *ReqUploadDataset) {
+	sensors := sched.base.Chans.Sensors
+	if !<-sensors.IsLeader {
+		log.WithFields(log.Fields{
+			"ID": sched.base.ID,
+		}).Info("FIFO scheduler: redirect upload dataset request to leader")
+		request.Response.DelegateToLeader <- RespDelegateToLeader{}
+		return
+	}
+
+	log.WithFields(log.Fields{
+		"ID": sched.base.ID,
+	}).Info("FIFO scheduler: processing upload_dataset request")
+
+	request.Response.Done <- RespDone{}
 }
