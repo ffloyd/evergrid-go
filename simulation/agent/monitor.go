@@ -20,6 +20,7 @@ func startMonitor(scheduler *scheduler.Scheduler, env *Environ, agentName string
 	}
 
 	go monitor.workerIsLeader()
+	go monitor.workerGlobalState()
 
 	log.WithFields(log.Fields{
 		"agent": agentName,

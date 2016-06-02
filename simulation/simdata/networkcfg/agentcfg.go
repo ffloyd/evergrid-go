@@ -6,8 +6,9 @@ import (
 
 // AgentCfgYAML is a representation of agent section in YAML infrastructure file
 type AgentCfgYAML struct {
-	Name string
-	Type string
+	Name        string
+	Type        string
+	ControlUnit string `yaml:"control_unit"`
 }
 
 // AgentType is an enum for agent types
@@ -23,8 +24,9 @@ const (
 
 // AgentCfg is a struct needed to create new agent.Agent instance
 type AgentCfg struct {
-	Name string
-	Type AgentType
+	Name            string
+	Type            AgentType
+	ControlUnitName string
 
 	Node *NodeCfg // parent
 }
@@ -33,9 +35,10 @@ type AgentCfg struct {
 // all validations must be performed on this stage
 func (agentYAML AgentCfgYAML) Parse(parent *NodeCfg) *AgentCfg {
 	return &AgentCfg{
-		Name: agentYAML.Name,
-		Type: resolveAgentType(agentYAML.Type),
-		Node: parent,
+		Name:            agentYAML.Name,
+		Type:            resolveAgentType(agentYAML.Type),
+		ControlUnitName: agentYAML.ControlUnit,
+		Node:            parent,
 	}
 }
 

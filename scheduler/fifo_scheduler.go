@@ -2,6 +2,7 @@ package scheduler
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/ffloyd/evergrid-go/global/types"
 )
 
 type fifoScheduler struct {
@@ -19,6 +20,7 @@ func (sched *fifoScheduler) run() {
 				log.WithFields(log.Fields{
 					"ID": sched.base.ID,
 				}).Info("FIFO scheduler: processing upload_dataset request")
+				sched.processRequest(<-<-chans.Sensors.GlobalState)
 				udReqest.Response.Done <- RespDone{}
 			} else {
 				log.WithFields(log.Fields{
@@ -28,4 +30,7 @@ func (sched *fifoScheduler) run() {
 			}
 		}
 	}
+}
+
+func (sched *fifoScheduler) processRequest(state *types.GlobalState) {
 }

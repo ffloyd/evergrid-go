@@ -1,5 +1,7 @@
 package scheduler
 
+import "github.com/ffloyd/evergrid-go/global/types"
+
 // Chans is a set of chans for communicate with scheduler
 type Chans struct {
 	Alive    chan bool
@@ -28,11 +30,13 @@ func newRequestChans() *RequestChans {
 
 // SensorChans is used by scheduler to determine global state
 type SensorChans struct {
-	IsLeader chan bool
+	IsLeader    chan bool
+	GlobalState chan chan *types.GlobalState // because we need lazy calculation of result
 }
 
 func newSensorChans() *SensorChans {
 	return &SensorChans{
-		IsLeader: make(chan bool),
+		IsLeader:    make(chan bool),
+		GlobalState: make(chan chan *types.GlobalState),
 	}
 }

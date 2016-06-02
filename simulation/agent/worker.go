@@ -9,6 +9,7 @@ import (
 // Worker is an agent which represents processes
 type Worker struct {
 	Base
+	ControlUnit *ControlUnit
 }
 
 // NewWorker creates new worker agent
@@ -18,9 +19,13 @@ func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) 
 	}
 	env.Workers[worker.Name()] = worker
 
+	worker.ControlUnit = env.ControlUnits[config.ControlUnitName]
+	worker.ControlUnit.workers = append(worker.ControlUnit.workers, worker)
+
 	log.WithFields(log.Fields{
-		"agent": worker.Name(),
-		"node":  worker.Node(),
+		"agent":        worker.Name(),
+		"node":         worker.Node(),
+		"control_unit": worker.ControlUnit.Name(),
 	}).Info("Worker agent initialized")
 	return worker
 }

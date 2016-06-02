@@ -9,3 +9,15 @@ type GlobalState struct {
 
 	ActiveJobs map[UID]*JobInfo
 }
+
+// NewGlobalState returns global state with initialized maps
+func NewGlobalState() *GlobalState {
+	return &GlobalState{
+		ControlUnits: make(map[UID]*ControlUnitInfo),
+		Datasets:     make(map[UID]*DatasetInfo),
+		Processors:   make(map[UID]*ProcessorInfo),
+		Workers:      make(map[UID]*WorkerInfo),
+
+		ActiveJobs: make(map[UID]*JobInfo),
+	}
+}

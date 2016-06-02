@@ -28,18 +28,21 @@ segments:
           -
             name: Worker A1
             type: worker
+            control_unit: Control Unit A
       -
         name: Worker A2 Node
         agents:
           -
             name: Worker A2
             type: worker
+            control_unit: Control Unit A
       -
         name: Worker A3 Node
         agents:
           -
             name: Worker A3
             type: worker
+            control_unit: Control Unit A
   -
     name: Segment B
     inner_bandwith: [100, 100]
@@ -57,15 +60,18 @@ segments:
           -
             name: Worker B1
             type: worker
+            control_unit: Control Unit B
       -
         name: Worker B2 Node
         agents:
           -
             name: Worker B2
             type: worker
+            control_unit: Control Unit B
       -
         name: Worker B3 Node
         agents:
           -
             name: Worker B3
             type: worker
+            control_unit: Control Unit B

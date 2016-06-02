@@ -8,5 +8,6 @@ type WorkerInfo struct {
 	TotalDiskSpace MByte
 	FreeDiskSpace  MByte
 	CurrentJob     *JobInfo
-	Datasets       []UID
+	Datasets       []*DatasetInfo
+	Processors     []*ProcessorInfo
 }
