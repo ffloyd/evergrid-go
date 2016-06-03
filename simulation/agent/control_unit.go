@@ -1,7 +1,10 @@
 package agent
 
 import (
+	"fmt"
+
 	log "github.com/Sirupsen/logrus"
+	"github.com/ffloyd/evergrid-go/global/types"
 	"github.com/ffloyd/evergrid-go/scheduler"
 	"github.com/ffloyd/evergrid-go/simulation/network"
 	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
@@ -18,6 +21,7 @@ type ControlUnit struct {
 
 	scheduler *scheduler.Scheduler
 	monitor   *Monitor
+	cuQueue   *cuQueue
 }
 
 // NewControlUnit creates a new control unit
@@ -71,7 +75,14 @@ SelectLoop:
 			<-leader.requestConfirmation
 			break SelectLoop
 		case resp := <-response.UploadDatasetToWorker:
-			log.Info(resp)
+			jobUID := fmt.Sprintf("Upload '%s' to worker '%s'", resp.Dataset, resp.Worker)
+			job := types.JobInfo{
+				UID:     types.UID(jobUID),
+				Type:    types.JobUploadDataset,
+				Worker:  resp.Worker,
+				Dataset: resp.Dataset,
+			}
+			unit.cuQueue.forWorker(string(resp.Worker)).push(job)
 		}
 	}
 }
@@ -94,11 +105,27 @@ func (unit *ControlUnit) startScheduler() {
 	}).Info("Scheduler started on Control Unit")
 }
 
+func (unit *ControlUnit) initQueues() {
+	workerNames := make([]string, len(unit.workers))
+	for i, worker := range unit.workers {
+		workerNames[i] = worker.Name()
+	}
+
+	unit.cuQueue = newCUQueue(workerNames)
+}
+
+func (unit *ControlUnit) processQueues() {
+	// TODO: processing queues
+}
+
 func (unit *ControlUnit) run() {
+	unit.initQueues()
 	unit.startScheduler()
 
 	for {
 		unit.sync.toReady()
+		unit.sync.toWorking()
+
 		unit.sync.toIdle()
 		doneCh := unit.sync.toDoneCallback()
 

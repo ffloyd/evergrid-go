@@ -7,7 +7,7 @@ import (
 	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
 
-// Worker is an agent which represents processes
+// Worker is an agent which represents worker machine
 type Worker struct {
 	Base
 	ControlUnit *ControlUnit
