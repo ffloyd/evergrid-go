@@ -2,13 +2,16 @@ package networkcfg
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/ffloyd/evergrid-go/global/types"
 )
 
 // AgentCfgYAML is a representation of agent section in YAML infrastructure file
 type AgentCfgYAML struct {
-	Name        string
-	Type        string
-	ControlUnit string `yaml:"control_unit"`
+	Name         string
+	Type         string
+	ControlUnit  string `yaml:"control_unit"`
+	WorkerDisk   int    `yaml:"worker_disk"`
+	WorkerMFlops int    `yaml:"worker_mflops"`
 }
 
 // AgentType is an enum for agent types
@@ -27,6 +30,8 @@ type AgentCfg struct {
 	Name            string
 	Type            AgentType
 	ControlUnitName string
+	WorkerDisk      types.MByte
+	WorkerMFlops    types.MFlop
 
 	Node *NodeCfg // parent
 }
@@ -38,6 +43,8 @@ func (agentYAML AgentCfgYAML) Parse(parent *NodeCfg) *AgentCfg {
 		Name:            agentYAML.Name,
 		Type:            resolveAgentType(agentYAML.Type),
 		ControlUnitName: agentYAML.ControlUnit,
+		WorkerDisk:      types.MByte(agentYAML.WorkerDisk * 1024),
+		WorkerMFlops:    types.MFlop(agentYAML.WorkerMFlops),
 		Node:            parent,
 	}
 }

@@ -29,6 +29,8 @@ segments:
             name: Worker A1
             type: worker
             control_unit: Control Unit A
+            worker_disk: 100
+            worker_mflops: 100000
       -
         name: Worker A2 Node
         agents:
@@ -36,6 +38,8 @@ segments:
             name: Worker A2
             type: worker
             control_unit: Control Unit A
+            worker_disk: 100
+            worker_mflops: 100000
       -
         name: Worker A3 Node
         agents:
@@ -43,6 +47,8 @@ segments:
             name: Worker A3
             type: worker
             control_unit: Control Unit A
+            worker_disk: 100
+            worker_mflops: 100000
   -
     name: Segment B
     inner_bandwith: [100, 100]
@@ -61,6 +67,8 @@ segments:
             name: Worker B1
             type: worker
             control_unit: Control Unit B
+            worker_disk: 100
+            worker_mflops: 100000
       -
         name: Worker B2 Node
         agents:
@@ -68,6 +76,8 @@ segments:
             name: Worker B2
             type: worker
             control_unit: Control Unit B
+            worker_disk: 100
+            worker_mflops: 100000
       -
         name: Worker B3 Node
         agents:
@@ -75,3 +85,5 @@ segments:
             name: Worker B3
             type: worker
             control_unit: Control Unit B
+            worker_disk: 100
+            worker_mflops: 100000

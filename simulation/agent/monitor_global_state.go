@@ -35,9 +35,8 @@ func (state *globalStateConstructor) Load(env *Environ) {
 		}
 
 		for i, worker := range cu.workers {
-			workerInfo := &types.WorkerInfo{
-				UID: types.UID(worker.Name()),
-			}
+			dump := worker.State
+			workerInfo := &dump
 			cuInfo.Workers[i] = workerInfo
 		}
 

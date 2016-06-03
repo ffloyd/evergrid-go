@@ -2,6 +2,7 @@ package agent
 
 import (
 	log "github.com/Sirupsen/logrus"
+	"github.com/ffloyd/evergrid-go/global/types"
 	"github.com/ffloyd/evergrid-go/simulation/network"
 	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 )
@@ -10,12 +11,20 @@ import (
 type Worker struct {
 	Base
 	ControlUnit *ControlUnit
+	State       types.WorkerInfo
 }
 
 // NewWorker creates new worker agent
 func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *Worker {
 	worker := &Worker{
 		Base: *NewBase(config, net, env),
+		State: types.WorkerInfo{
+			UID:            types.UID(config.Name),
+			Busy:           false,
+			MFlops:         config.WorkerMFlops,
+			TotalDiskSpace: config.WorkerDisk,
+			FreeDiskSpace:  config.WorkerDisk,
+		},
 	}
 	env.Workers[worker.Name()] = worker
 
