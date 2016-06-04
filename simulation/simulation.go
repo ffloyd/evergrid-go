@@ -35,6 +35,8 @@ func New(simdataFilename string) *Simulation {
 		sim.addAgent(agentConfig)
 	}
 
+	sim.initDatasetsAndProcessors()
+
 	sim.ticker = ticker.New(sim.agents.SyncGroup())
 
 	log.WithFields(log.Fields{
@@ -56,6 +58,20 @@ func (sim *Simulation) addAgent(agentConfig *networkcfg.AgentCfg) {
 		agent.NewCore(agentConfig, sim.network, sim.agents, sim.simData.Workload)
 	default:
 		log.Fatalf("Unknown agent type")
+	}
+}
+
+func (sim *Simulation) initDatasetsAndProcessors() {
+	data := sim.simData.Workload.Data
+
+	for _, datasetConf := range data.Datasets {
+		dataset := datasetConf.Info()
+		sim.agents.Datasets[string(dataset.UID)] = dataset
+	}
+
+	for _, processorConf := range data.Processors {
+		processor := processorConf.Info()
+		sim.agents.Processors[string(processor.UID)] = processor
 	}
 }
 

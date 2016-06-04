@@ -82,7 +82,9 @@ SelectLoop:
 				Worker:  resp.Worker,
 				Dataset: resp.Dataset,
 			}
-			unit.cuQueue.forWorker(string(resp.Worker)).push(job)
+
+			queue := unit.env.Workers[string(resp.Worker)].ControlUnit.cuQueue
+			queue.forWorker(string(resp.Worker)).push(job)
 		}
 	}
 }
@@ -115,7 +117,24 @@ func (unit *ControlUnit) initQueues() {
 }
 
 func (unit *ControlUnit) processQueues() {
-	// TODO: processing queues
+	for workerName, queue := range unit.cuQueue.workersQueues {
+		worker := unit.env.Workers[workerName]
+		if worker.State.Busy {
+			continue
+		}
+
+		nextJob := queue.pop()
+		if nextJob == nil {
+			continue
+		}
+
+		switch nextJob.Type {
+		case types.JobUploadDataset:
+			worker.NewUpload <- unit.env.Datasets[string(nextJob.Dataset)]
+		default:
+			log.Panic("Unknown job type")
+		}
+	}
 }
 
 func (unit *ControlUnit) run() {
@@ -125,7 +144,7 @@ func (unit *ControlUnit) run() {
 	for {
 		unit.sync.toReady()
 		unit.sync.toWorking()
-
+		unit.processQueues()
 		unit.sync.toIdle()
 		doneCh := unit.sync.toDoneCallback()
 

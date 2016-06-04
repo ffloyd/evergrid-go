@@ -30,6 +30,11 @@ func (node *Node) AttachAgent(agent Agent) {
 	node.agents[agent.Name()] = agent
 }
 
+// Segment returns node's network segment
+func (node *Node) Segment() *Segment {
+	return node.segment
+}
+
 // String implements fmt.Stringer interface
 func (node Node) String() string {
 	return fmt.Sprintf("%s (%s)", node.name, node.segment.name)

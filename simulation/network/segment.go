@@ -38,3 +38,25 @@ func newSegment(config *networkcfg.SegmentCfg, parent *Network) *Segment {
 
 	return segment
 }
+
+// AgentNames returns all agent names inside segment
+func (seg *Segment) AgentNames() []string {
+	var result []string
+
+	for _, node := range seg.nodes {
+		for _, agent := range node.agents {
+			result = append(result, agent.Name())
+		}
+	}
+
+	return result
+}
+
+// Bandwith return inner or outer bandwith depends on argument
+func (seg *Segment) Bandwith(inner bool) Bandwith {
+	if inner {
+		return seg.innerBandwith
+	}
+
+	return seg.outerBandwith
+}

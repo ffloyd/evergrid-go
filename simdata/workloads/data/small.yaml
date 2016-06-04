@@ -2,8 +2,8 @@ name: Small
 datasets:
     -
         name: Dataset 1
-        size: 1024
+        size: 1
 processors:
     -
         name: Processor 1
-        gflops_per_mb: 512
+        mflops_per_mb: 512

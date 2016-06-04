@@ -1,13 +1,19 @@
 package agent
 
-import "github.com/ffloyd/evergrid-go/simulation/ticker"
+import (
+	"github.com/ffloyd/evergrid-go/global/types"
+	"github.com/ffloyd/evergrid-go/simulation/ticker"
+)
 
-// Environ is a set of all agents in the system
+// Environ is a set of all agents, known datasets and processors in the system
 type Environ struct {
 	Dummies      map[string]*Dummy
 	Workers      map[string]*Worker
 	ControlUnits map[string]*ControlUnit
 	Cores        map[string]*Core
+
+	Datasets   map[string]*types.DatasetInfo
+	Processors map[string]*types.ProcessorInfo
 
 	leaderControlUnit *ControlUnit
 }
@@ -19,6 +25,8 @@ func NewEnviron() *Environ {
 		Workers:      make(map[string]*Worker),
 		ControlUnits: make(map[string]*ControlUnit),
 		Cores:        make(map[string]*Core),
+		Datasets:     make(map[string]*types.DatasetInfo),
+		Processors:   make(map[string]*types.ProcessorInfo),
 	}
 }
 
