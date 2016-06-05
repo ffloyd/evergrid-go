@@ -16,6 +16,8 @@ func (sched *fifoScheduler) run() {
 		case chans.Alive <- true:
 		case udReqest := <-chans.Requests.UploadDataset:
 			sched.processUploadDataset(udReqest)
+		case rdRequest := <-chans.Requests.RunProcessorOnDataset:
+			sched.processRunProcessorOnDataset(rdRequest)
 		}
 	}
 }
@@ -47,5 +49,12 @@ func (sched *fifoScheduler) processUploadDataset(request *ReqUploadDataset) {
 		Worker:  firstWorker.UID,
 	}
 
+	request.Response.Done <- RespDone{}
+}
+
+func (sched *fifoScheduler) processRunProcessorOnDataset(request *ReqRunProcessorOnDataset) {
+	log.WithFields(log.Fields{
+		"ID": sched.base.ID,
+	}).Info("FIFO scheduler: processing run_processor request")
 	request.Response.Done <- RespDone{}
 }

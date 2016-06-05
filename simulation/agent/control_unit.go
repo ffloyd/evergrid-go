@@ -44,8 +44,40 @@ func (unit *ControlUnit) processRequest(request *workloadcfg.RequestCfg) {
 	switch request.Type {
 	case "upload_dataset":
 		unit.processDataUpload(request)
+	case "run_expirement":
+		unit.processRunExperiment(request)
 	default:
 		log.Fatalf("Unknown request type: %s", request.Type)
+	}
+}
+
+func (unit *ControlUnit) processRunExperiment(request *workloadcfg.RequestCfg) {
+	schedReq := scheduler.NewReqRunProcessorOnDataset(request.Dataset.Name, request.Processor.Name)
+
+	unit.scheduler.Chans.Requests.RunProcessorOnDataset <- schedReq
+	response := schedReq.Response
+
+SelectLoop:
+	for {
+		select {
+		case <-response.Done:
+			log.WithFields(log.Fields{
+				"agent":     unit,
+				"dataset":   request.Dataset.Name,
+				"processor": request.Processor.Name,
+			}).Info("Run processor request processed")
+			break SelectLoop
+		case <-response.DelegateToLeader:
+			leader := unit.env.LeaderControlUnit()
+			log.WithFields(log.Fields{
+				"agent":   unit,
+				"dataset": request.Dataset.Name,
+				"leader":  leader,
+			}).Info("Redirecting run processor request to leader")
+			leader.incomingRequests <- request
+			<-leader.requestConfirmation
+			break SelectLoop
+		}
 	}
 }
 

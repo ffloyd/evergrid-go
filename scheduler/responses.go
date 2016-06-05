@@ -14,3 +14,22 @@ func newRespUploadDataset() *RespUploadDataset {
 		Done: make(chan RespDone),
 	}
 }
+
+// RespRunProcessorOnDataset - response for ReqRunProcessorOnDataset
+type RespRunProcessorOnDataset struct {
+	DelegateToLeader      chan RespDelegateToLeader
+	UploadDatasetToWorker chan RespUploadDatasetToWorker
+	BuildProcessor        chan RespBuildProcessor
+	RunProcessor          chan RespRunProcessor
+	Done                  chan RespDone
+}
+
+func newRespRunProcessorOnDataset() *RespRunProcessorOnDataset {
+	return &RespRunProcessorOnDataset{
+		DelegateToLeader:      make(chan RespDelegateToLeader),
+		UploadDatasetToWorker: make(chan RespUploadDatasetToWorker),
+		BuildProcessor:        make(chan RespBuildProcessor),
+		RunProcessor:          make(chan RespRunProcessor),
+		Done:                  make(chan RespDone),
+	}
+}

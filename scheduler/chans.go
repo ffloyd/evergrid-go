@@ -19,12 +19,14 @@ func newChans() *Chans {
 
 // RequestChans - chans for requests for scheduler
 type RequestChans struct {
-	UploadDataset chan *ReqUploadDataset
+	UploadDataset         chan *ReqUploadDataset
+	RunProcessorOnDataset chan *ReqRunProcessorOnDataset
 }
 
 func newRequestChans() *RequestChans {
 	return &RequestChans{
-		UploadDataset: make(chan *ReqUploadDataset),
+		UploadDataset:         make(chan *ReqUploadDataset),
+		RunProcessorOnDataset: make(chan *ReqRunProcessorOnDataset),
 	}
 }
 
