@@ -77,6 +77,39 @@ SelectLoop:
 			leader.incomingRequests <- request
 			<-leader.requestConfirmation
 			break SelectLoop
+		case resp := <-response.UploadDatasetToWorker:
+			jobUID := fmt.Sprintf("Upload '%s' to worker '%s'", resp.Dataset, resp.Worker)
+			job := types.JobInfo{
+				UID:     types.UID(jobUID),
+				Type:    types.JobUploadDataset,
+				Worker:  resp.Worker,
+				Dataset: resp.Dataset,
+			}
+
+			queue := unit.env.Workers[string(resp.Worker)].ControlUnit.cuQueue
+			queue.forWorker(string(resp.Worker)).push(job)
+		case resp := <-response.BuildProcessor:
+			jobUID := fmt.Sprintf("Build processor '%s' on worker '%s'", resp.Processor, resp.Worker)
+			job := types.JobInfo{
+				UID:       types.UID(jobUID),
+				Type:      types.JobBuildProcessor,
+				Worker:    resp.Worker,
+				Processor: resp.Processor,
+			}
+
+			queue := unit.env.Workers[string(resp.Worker)].ControlUnit.cuQueue
+			queue.forWorker(string(resp.Worker)).push(job)
+		case resp := <-response.RunProcessor:
+			jobUID := fmt.Sprintf("Build processor '%s' on worker '%s'", resp.Processor, resp.Worker)
+			job := types.JobInfo{
+				UID:       types.UID(jobUID),
+				Type:      types.JobRunProcessor,
+				Worker:    resp.Worker,
+				Processor: resp.Processor,
+			}
+
+			queue := unit.env.Workers[string(resp.Worker)].ControlUnit.cuQueue
+			queue.forWorker(string(resp.Worker)).push(job)
 		}
 	}
 }
@@ -163,6 +196,10 @@ func (unit *ControlUnit) processQueues() {
 		switch nextJob.Type {
 		case types.JobUploadDataset:
 			worker.NewUpload <- unit.env.Datasets[string(nextJob.Dataset)]
+		case types.JobBuildProcessor:
+			worker.NewProcessorBuild <- unit.env.Processors[string(nextJob.Processor)]
+		case types.JobRunProcessor:
+			worker.NewProcessorRun <- unit.env.Processors[string(nextJob.Processor)]
 		default:
 			log.Panic("Unknown job type")
 		}

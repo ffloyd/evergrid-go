@@ -53,8 +53,28 @@ func (sched *fifoScheduler) processUploadDataset(request *ReqUploadDataset) {
 }
 
 func (sched *fifoScheduler) processRunProcessorOnDataset(request *ReqRunProcessorOnDataset) {
+	sensors := sched.base.Chans.Sensors
 	log.WithFields(log.Fields{
 		"ID": sched.base.ID,
 	}).Info("FIFO scheduler: processing run_processor request")
+
+	status := <-<-sensors.GlobalState
+
+	var firstWorker *types.WorkerInfo
+	for _, worker := range status.Workers {
+		firstWorker = worker
+		break
+	}
+
+	request.Response.BuildProcessor <- RespBuildProcessor{
+		Processor: types.UID(request.ProcessorID),
+		Worker:    firstWorker.UID,
+	}
+
+	request.Response.RunProcessor <- RespRunProcessor{
+		Processor: types.UID(request.ProcessorID),
+		Worker:    firstWorker.UID,
+	}
+
 	request.Response.Done <- RespDone{}
 }

@@ -16,15 +16,29 @@ type Worker struct {
 	ControlUnit *ControlUnit
 	State       types.WorkerInfo
 
-	NewUpload chan *types.DatasetInfo
+	NewUpload         chan *types.DatasetInfo
+	NewProcessorBuild chan *types.ProcessorInfo
+	NewProcessorRun   chan *types.ProcessorInfo
 
 	currentUpload *jobProcessUpload
+	currentBuild  *jobBuildProcessor
+	currentRun    *jobRunProcessor
 }
 
 type jobProcessUpload struct {
 	Dataset  *types.DatasetInfo
 	speed    types.MBit
 	uploaded types.MByte
+}
+
+type jobBuildProcessor struct {
+	Processor *types.ProcessorInfo
+	progress  int // from 0 to 100
+}
+
+type jobRunProcessor struct {
+	Processor  *types.ProcessorInfo
+	mflopsDone types.MFlop
 }
 
 // NewWorker creates new worker agent
@@ -40,7 +54,9 @@ func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) 
 			Datasets:       make(map[types.UID]*types.DatasetInfo),
 			Processors:     make(map[types.UID]*types.ProcessorInfo),
 		},
-		NewUpload: make(chan *types.DatasetInfo),
+		NewUpload:         make(chan *types.DatasetInfo),
+		NewProcessorBuild: make(chan *types.ProcessorInfo),
+		NewProcessorRun:   make(chan *types.ProcessorInfo),
 	}
 	env.Workers[worker.Name()] = worker
 
@@ -56,7 +72,7 @@ func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) 
 }
 
 func (worker *Worker) startUpload(dataset *types.DatasetInfo) {
-	if worker.currentUpload != nil {
+	if worker.State.Busy {
 		log.Panicf("Worker '%s' is busy now", worker.Name())
 	}
 
@@ -136,11 +152,114 @@ func (worker *Worker) processUpload() {
 	}
 }
 
+func (worker *Worker) startBuildProcessor(processor *types.ProcessorInfo) {
+	if worker.State.Busy {
+		log.Panicf("Worker '%s' is busy now", worker.Name())
+	}
+
+	build := &jobBuildProcessor{
+		Processor: processor,
+		progress:  0,
+	}
+
+	processorUID := build.Processor.UID
+
+	// check for "already bult" situation
+	if worker.State.Processors[processorUID] != nil {
+		worker.currentBuild = nil
+		log.WithFields(log.Fields{
+			"agent":     worker.Name(),
+			"processor": processorUID,
+		}).Info("Processor already presents on this worker")
+		return
+	}
+
+	worker.currentBuild = build
+	worker.State.Busy = true
+	log.WithFields(log.Fields{
+		"agent":     worker.Name(),
+		"processor": processorUID,
+	}).Info("Initiate processor build")
+}
+
+func (worker *Worker) processBuildProcessor() {
+	build := worker.currentBuild
+	if build == nil {
+		return
+	}
+
+	// 1 minute build for everything for now
+	worker.currentBuild = nil
+	worker.State.Busy = false
+	worker.State.Processors[build.Processor.UID] = build.Processor
+
+	log.WithFields(log.Fields{
+		"agent":     worker.Name(),
+		"processor": build.Processor.UID,
+	}).Info("Processor built")
+}
+
+func (worker *Worker) startRunProcessor(processor *types.ProcessorInfo) {
+	if worker.State.Busy {
+		log.Panicf("Worker '%s' is busy now", worker.Name())
+	}
+
+	run := &jobRunProcessor{
+		Processor:  processor,
+		mflopsDone: 0,
+	}
+
+	processorUID := run.Processor.UID
+	if worker.State.Processors[processorUID] == nil {
+		log.Panic("Processor must be build on worker before execution")
+	}
+
+	worker.currentRun = run
+	worker.State.Busy = true
+	log.WithFields(log.Fields{
+		"agent":     worker.Name(),
+		"processor": processorUID,
+	}).Info("Initiate processor run")
+}
+
+func (worker *Worker) processRunProcessor() {
+	run := worker.currentRun
+	if run == nil {
+		return
+	}
+
+	// 1 tick == 1 minute
+	worker.currentRun.mflopsDone += worker.State.MFlops * 60
+
+	currentMFlops := worker.currentRun.mflopsDone
+	totalMFlops := worker.currentRun.Processor.MFlopsPerMb * 200000
+
+	if currentMFlops >= totalMFlops {
+		worker.currentRun = nil
+		worker.State.Busy = false
+
+		log.WithFields(log.Fields{
+			"agent":     worker.Name(),
+			"processor": run.Processor.UID,
+		}).Info("Processor executed")
+	} else {
+		progress := math.Min(1.0, float64(currentMFlops)/float64(totalMFlops))
+
+		log.WithFields(log.Fields{
+			"agent":     worker.Name(),
+			"processor": run.Processor.UID,
+			"progress":  fmt.Sprintf("%d%%", int(progress*100)),
+		}).Info("Processing...")
+	}
+}
+
 func (worker *Worker) run() {
 	for {
 		worker.sync.toReady()
 		worker.sync.toWorking()
 		worker.processUpload()
+		worker.processBuildProcessor()
+		worker.processRunProcessor()
 		worker.sync.toIdle()
 		doneCh := worker.sync.toDoneCallback()
 
@@ -149,6 +268,10 @@ func (worker *Worker) run() {
 			select {
 			case dataset := <-worker.NewUpload:
 				worker.startUpload(dataset)
+			case processor := <-worker.NewProcessorBuild:
+				worker.startBuildProcessor(processor)
+			case processor := <-worker.NewProcessorRun:
+				worker.startRunProcessor(processor)
 			case <-doneCh:
 				break SelectLoop
 			}
