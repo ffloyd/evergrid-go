@@ -74,6 +74,7 @@ func (sched *fifoScheduler) processRunProcessorOnDataset(request *ReqRunProcesso
 	request.Response.RunProcessor <- RespRunProcessor{
 		Processor: types.UID(request.ProcessorID),
 		Worker:    firstWorker.UID,
+		Dataset:   types.UID(request.DatasetID),
 	}
 
 	request.Response.Done <- RespDone{}

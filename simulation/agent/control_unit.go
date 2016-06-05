@@ -106,6 +106,7 @@ SelectLoop:
 				Type:      types.JobRunProcessor,
 				Worker:    resp.Worker,
 				Processor: resp.Processor,
+				Dataset:   resp.Dataset,
 			}
 
 			queue := unit.env.Workers[string(resp.Worker)].ControlUnit.cuQueue
@@ -199,7 +200,10 @@ func (unit *ControlUnit) processQueues() {
 		case types.JobBuildProcessor:
 			worker.NewProcessorBuild <- unit.env.Processors[string(nextJob.Processor)]
 		case types.JobRunProcessor:
-			worker.NewProcessorRun <- unit.env.Processors[string(nextJob.Processor)]
+			worker.NewProcessorRun <- WorkerRunProcessorRequest{
+				Processor: unit.env.Processors[string(nextJob.Processor)],
+				Dataset:   unit.env.Datasets[string(nextJob.Dataset)],
+			}
 		default:
 			log.Panic("Unknown job type")
 		}

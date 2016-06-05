@@ -18,7 +18,7 @@ type Worker struct {
 
 	NewUpload         chan *types.DatasetInfo
 	NewProcessorBuild chan *types.ProcessorInfo
-	NewProcessorRun   chan *types.ProcessorInfo
+	NewProcessorRun   chan WorkerRunProcessorRequest
 
 	currentUpload *jobProcessUpload
 	currentBuild  *jobBuildProcessor
@@ -38,7 +38,14 @@ type jobBuildProcessor struct {
 
 type jobRunProcessor struct {
 	Processor  *types.ProcessorInfo
+	Dataset    *types.DatasetInfo
 	mflopsDone types.MFlop
+}
+
+// WorkerRunProcessorRequest - request format for one of worker's channels
+type WorkerRunProcessorRequest struct {
+	Processor *types.ProcessorInfo
+	Dataset   *types.DatasetInfo
 }
 
 // NewWorker creates new worker agent
@@ -56,7 +63,7 @@ func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) 
 		},
 		NewUpload:         make(chan *types.DatasetInfo),
 		NewProcessorBuild: make(chan *types.ProcessorInfo),
-		NewProcessorRun:   make(chan *types.ProcessorInfo),
+		NewProcessorRun:   make(chan WorkerRunProcessorRequest),
 	}
 	env.Workers[worker.Name()] = worker
 
@@ -199,13 +206,14 @@ func (worker *Worker) processBuildProcessor() {
 	}).Info("Processor built")
 }
 
-func (worker *Worker) startRunProcessor(processor *types.ProcessorInfo) {
+func (worker *Worker) startRunProcessor(req WorkerRunProcessorRequest) {
 	if worker.State.Busy {
 		log.Panicf("Worker '%s' is busy now", worker.Name())
 	}
 
 	run := &jobRunProcessor{
-		Processor:  processor,
+		Processor:  req.Processor,
+		Dataset:    req.Dataset,
 		mflopsDone: 0,
 	}
 
@@ -231,8 +239,8 @@ func (worker *Worker) processRunProcessor() {
 	// 1 tick == 1 minute
 	worker.currentRun.mflopsDone += worker.State.MFlops * 60
 
-	currentMFlops := worker.currentRun.mflopsDone
-	totalMFlops := worker.currentRun.Processor.MFlopsPerMb * 200000
+	currentMFlops := run.mflopsDone
+	totalMFlops := run.Processor.MFlopsPerMb * types.MFlop(run.Dataset.Size)
 
 	if currentMFlops >= totalMFlops {
 		worker.currentRun = nil
@@ -270,8 +278,8 @@ func (worker *Worker) run() {
 				worker.startUpload(dataset)
 			case processor := <-worker.NewProcessorBuild:
 				worker.startBuildProcessor(processor)
-			case processor := <-worker.NewProcessorRun:
-				worker.startRunProcessor(processor)
+			case req := <-worker.NewProcessorRun:
+				worker.startRunProcessor(req)
 			case <-doneCh:
 				break SelectLoop
 			}
