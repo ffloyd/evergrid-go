@@ -4,5 +4,5 @@ package types
 type ProcessorInfo struct {
 	UID         UID
 	MFlopsPerMb MFlop
-	Workers     []*WorkerInfo
+	Workers     []UID
 }

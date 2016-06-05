@@ -18,6 +18,6 @@ func (conf *DatasetCfg) Info() *types.DatasetInfo {
 	return &types.DatasetInfo{
 		UID:     types.UID(conf.Name),
 		Size:    types.MByte(conf.Size * 1024),
-		Workers: make([]*types.WorkerInfo, 0),
+		Workers: make([]types.UID, 0),
 	}
 }

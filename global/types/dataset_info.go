@@ -4,5 +4,5 @@ package types
 type DatasetInfo struct {
 	UID     UID
 	Size    MByte
-	Workers []*WorkerInfo
+	Workers []UID
 }
