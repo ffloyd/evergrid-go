@@ -1,0 +1,109 @@
+\documentclass[%
+master,         % тип документа
+natbib,         % использовать пакет natbib для "сжатия" цитирований
+subf,           % использовать пакет subcaption для вложенной нумерации рисунков
+href,           % использовать пакет hyperref для создания гиперссылок
+colorlinks=true % цветные гиперссылки
+%,fixint=false  % отключить прямые знаки интегралов
+%,times         % шрифт Times как основной
+]{disser}
+
+\usepackage[
+  a4paper, mag=1000,
+  left=2.5cm, right=1cm, top=2cm, bottom=2cm, headsep=0.7cm, footskip=1cm
+]{geometry}
+\usepackage[T2A]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[english,russian]{babel}
+%\usepackage{tabularx,longtable}
+\ifpdf\usepackage{epstopdf}\fi
+
+% Номера страниц снизу и по центру
+%\pagestyle{footcenter}
+%\chapterpagestyle{footcenter}
+
+% Точка с запятой в качестве разделителя между номерами цитирований
+%\setcitestyle{semicolon}
+
+% Использовать полужирное начертание для векторов
+\let\vec=\mathbf
+
+% Включать подсекции в оглавление
+\setcounter{tocdepth}{2}
+
+\graphicspath{{fig/}}
+
+\begin{document}
+
+% Переопределение стандартных заголовков
+%\def\contentsname{Содержание}
+%\def\conclusionname{Выводы}
+%\def\bibname{Литература}
+
+\institution{Министерство образования и науки Российской Федерации\\
+			Московский физико-технический институт {\rm(государственный университет)}\\
+			Факультет управления и прикладной математики\\
+			Кафедра информатики}
+
+% Имя лица, допускающего к защите (зав. кафедрой)
+\apname{Петров Игорь Борисович}
+
+\title{ДИССЕРТАЦИЯ\\[-14pt]на соискание ученой степени\\МАГИСТРА}
+
+\topic{Разработка алгоритма оптимального распределения задач и данных по ресурсам облачных инфраструктур}
+
+% Автор
+\author       {Колеснев Роман Владимирович} % ФИО
+\group        {073а} % Группа
+\coursenum    {511656} % Номер направления
+\course       {Математические и информационные технологии}
+\masterprognum{????} % Номер магистерской программы
+\masterprog   {Название программы}
+
+% Научный руководитель
+\sa      {Устюжанин Андрей Евгеньевич}
+\sastatus{к.~ф.-м.~н., доцент}
+
+% Рецензент
+\rev      {???}
+\revstatus{д.~ф.-м.~н., в.~н.~с.???}
+% Второй рецензент
+%\revsnd      {ФИО рецензента}
+%\revsndstatus{д.~т.~н., ст.~н.~с.}
+
+% Консультант
+%\con{ФИО консультанта}
+%\conspec{вопросам\\охраны труда}
+%\constatus{к.~т.~н., доц.}
+% Второй консультант
+%\consnd{ФИО консультанта}
+%\consndspec{экономическим\\вопросам}
+%\consndstatus{к.~э.~н., доц.}
+
+% Город и год
+\city{Москва}
+\date{\number2016}
+
+\maketitle
+
+% Содержание
+\tableofcontents
+% Введение
+\input{intro}
+% Глава 1
+\input{ch1}
+% Глава 2
+%\input{2}
+
+% Заключение
+\input{concl}
+
+% Список литературы
+\bibliography{thesis}
+\bibliographystyle{gost705}
+
+% Приложения
+\appendix
+%\input{app-a}
+
+\end{document}
