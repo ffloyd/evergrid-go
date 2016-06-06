@@ -288,7 +288,7 @@ func (worker *Worker) run() {
 }
 
 // Run is implementation of agent.Runner iface
-func (worker Worker) Run() *Synchronizer {
+func (worker *Worker) Run() *Synchronizer {
 	go worker.run()
 	return worker.sync
 }

@@ -31,7 +31,7 @@ func NewCore(config *networkcfg.AgentCfg, net *network.Network, env *Environ, wo
 	return core
 }
 
-func (core Core) getControlUnit() *ControlUnit {
+func (core *Core) getControlUnit() *ControlUnit {
 	count := len(core.env.ControlUnits)
 	controlUnits := make([]*ControlUnit, count)
 	cuIndex := 0
@@ -43,7 +43,7 @@ func (core Core) getControlUnit() *ControlUnit {
 	return controlUnits[rand.Intn(count)]
 }
 
-func (core Core) run() {
+func (core *Core) run() {
 	for {
 		core.sync.toReady()
 		core.sync.toWorking()
@@ -66,7 +66,7 @@ func (core Core) run() {
 }
 
 // Run is implementation of agent.Runner iface
-func (core Core) Run() *Synchronizer {
+func (core *Core) Run() *Synchronizer {
 	go core.run()
 	return core.sync
 }

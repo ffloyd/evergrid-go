@@ -141,6 +141,11 @@ SelectLoop:
 			<-leader.requestConfirmation
 			break SelectLoop
 		case resp := <-response.UploadDatasetToWorker:
+			log.WithFields(log.Fields{
+				"agent":   unit,
+				"dataset": request.Dataset.Name,
+				"worker":  resp.Worker,
+			}).Info("Enqueue uploading to worker")
 			jobUID := fmt.Sprintf("Upload '%s' to worker '%s'", resp.Dataset, resp.Worker)
 			job := types.JobInfo{
 				UID:     types.UID(jobUID),

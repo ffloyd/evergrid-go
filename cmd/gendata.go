@@ -32,10 +32,10 @@ DISTDIR argument is a name of directory for generated dimdata. NAME - id a name 
 			MaxDatasetSize: 20,
 
 			ProcessorsCount: 20,
-			MinSpeed:        100,
-			MaxSpeed:        20000,
+			MinSpeed:        10,
+			MaxSpeed:        2000,
 
-			ProcessorRuns:  1000,
+			ProcessorRuns:  100,
 			RunProbability: 0.10,
 
 			NetworkSegments:   3,
