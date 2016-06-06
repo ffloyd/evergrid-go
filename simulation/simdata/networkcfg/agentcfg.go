@@ -9,9 +9,9 @@ import (
 type AgentCfgYAML struct {
 	Name         string
 	Type         string
-	ControlUnit  string `yaml:"control_unit"`
-	WorkerDisk   int    `yaml:"worker_disk"`
-	WorkerMFlops int    `yaml:"worker_mflops"`
+	ControlUnit  string `yaml:"control_unit,omitempty"`
+	WorkerDisk   int    `yaml:"worker_disk,omitempty"`
+	WorkerMFlops int    `yaml:"worker_mflops,omitempty"`
 }
 
 // AgentType is an enum for agent types
