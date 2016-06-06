@@ -1,4 +1,5 @@
 /vendor
+/simdata
 
 # personal todo list
 TODO.local.md
