@@ -77,6 +77,18 @@ func (sim *Simulation) initDatasetsAndProcessors() {
 
 func (sim *Simulation) report() {
 	log.WithField("value", sim.ticker.CurrentTick()).Info("Report: total ticks")
+
+	totalExecutionTicks := 0
+	for _, worker := range sim.agents.Workers {
+		totalExecutionTicks += worker.State.Stats.ExecutionTicks
+	}
+	log.WithField("value", totalExecutionTicks).Info("Report: total execution ticks on worker")
+
+	totalUploadTicks := 0
+	for _, worker := range sim.agents.Workers {
+		totalUploadTicks += worker.State.Stats.UploadTicks
+	}
+	log.WithField("value", totalUploadTicks).Info("Report: total upload ticks on worker")
 }
 
 // Run starts simulation

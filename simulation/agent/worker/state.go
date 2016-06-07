@@ -7,7 +7,8 @@ import (
 
 // State is a worker state struct. Only its methods should change WorkerInfo fields
 type State struct {
-	info *types.WorkerInfo
+	info  *types.WorkerInfo
+	Stats *Stats
 }
 
 // NewState creates a new state for worker
@@ -22,6 +23,7 @@ func NewState(name string, diskSpace types.MByte, performance types.MFlop) *Stat
 			Datasets:       make(map[types.UID]*types.DatasetInfo),
 			Processors:     make(map[types.UID]*types.ProcessorInfo),
 		},
+		Stats: NewStats(),
 	}
 }
 

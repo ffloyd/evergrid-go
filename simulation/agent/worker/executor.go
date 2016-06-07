@@ -48,6 +48,8 @@ func (executor *Executor) Process() {
 		return
 	}
 
+	executor.state.Stats.ExecutionTicks++
+
 	// 1 tick == 1 minute
 	executor.mflopsDone += executor.state.info.MFlops * 60
 

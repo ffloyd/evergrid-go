@@ -77,6 +77,8 @@ func (uploader *Uploader) Process() {
 		return
 	}
 
+	uploader.state.Stats.UploadTicks++
+
 	// 1 tick = 1 minute
 	mbytesDownloaded := types.MByte(uploader.speed * 60 / 8)
 	uploader.uploaded += mbytesDownloaded

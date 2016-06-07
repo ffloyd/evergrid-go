@@ -47,6 +47,8 @@ func (builder *Builder) Process() {
 		return
 	}
 
+	builder.state.Stats.BuildTicks++
+
 	// 1 (initialization) tick build for everything for now
 	builder.building = false
 	builder.state.AddProcessor(builder.processor)
