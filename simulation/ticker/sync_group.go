@@ -9,6 +9,10 @@ import (
 // SyncGroup is a group of syncables which works as one syncable
 type SyncGroup []Syncable
 
+//
+// Syncable interface implementation
+//
+
 // CreateStatusChan is an implementation of Syncable interface
 func (group SyncGroup) CreateStatusChan() chan SyncableStatus {
 	result := make(chan SyncableStatus)
@@ -36,6 +40,17 @@ func (group SyncGroup) CreateFinishWorkChan() chan bool {
 	go group.finishWorkChanWorker(result)
 	return result
 }
+
+// CreateStopFlagChan is an implementation of Syncable interface
+func (group SyncGroup) CreateStopFlagChan() chan bool {
+	result := make(chan bool)
+	go group.stopFlagChanWorker(result)
+	return result
+}
+
+//
+// Channel workers
+//
 
 func (group SyncGroup) statusChanWorker(parentChan chan SyncableStatus) {
 	statuses := make([]SyncableStatus, len(group))
@@ -119,6 +134,42 @@ func (group SyncGroup) finishWorkChanWorker(parentChan chan bool) {
 		message := <-parentChan
 		for _, nestedChan := range nestedChans {
 			nestedChan <- message
+		}
+	}
+}
+
+func (group SyncGroup) stopFlagChanWorker(parentChan chan bool) {
+	nestedStates := make([]bool, len(group))
+
+	cases := make([]reflect.SelectCase, len(group))
+	for i, sync := range group {
+		cases[i] = reflect.SelectCase{
+			Dir:  reflect.SelectRecv,
+			Chan: reflect.ValueOf(sync.CreateStopFlagChan()),
+		}
+	}
+
+	state := func() bool {
+		for _, value := range nestedStates {
+			if !value {
+				return false
+			}
+		}
+		return true
+	}
+
+	for {
+		chosen, rawValue, ok := reflect.Select(cases)
+		if ok != true {
+			log.Panic("SyncGroup fail")
+		}
+
+		stateBefore := state()
+		nestedStates[chosen] = rawValue.Bool()
+		stateAfter := state()
+
+		if stateBefore != stateAfter {
+			parentChan <- stateAfter
 		}
 	}
 }

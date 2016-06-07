@@ -30,6 +30,7 @@ func (agent Dummy) run() {
 		agent.sync.toReady()
 		agent.sync.toIdle()
 		<-agent.sync.toDoneCallback()
+		agent.sync.SetStopFlag(true)
 	}
 }
 

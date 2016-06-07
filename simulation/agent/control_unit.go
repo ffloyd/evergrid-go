@@ -220,6 +220,18 @@ func (unit *ControlUnit) processQueues() {
 	}
 }
 
+func (unit *ControlUnit) stopFlagUpdate() {
+	// stop flag is true if there are no stuff in queues
+	queues := unit.cuQueue.workersQueues
+
+	totalTasks := 0
+	for _, que := range queues {
+		totalTasks += len(que.queue)
+	}
+
+	unit.sync.SetStopFlag(totalTasks == 0)
+}
+
 func (unit *ControlUnit) run() {
 	unit.initQueues()
 	unit.startScheduler()
@@ -245,6 +257,7 @@ func (unit *ControlUnit) run() {
 				unit.processRequest(request)
 				unit.sync.toIdle()
 			case <-doneCh:
+				unit.stopFlagUpdate()
 				break SelectLoop
 			}
 		}

@@ -8,26 +8,29 @@ import (
 type Ticker struct {
 	currentTick int
 
-	ticksChan     chan int
-	statusChan    chan SyncableStatus
-	startWorkChan chan bool
-	finisWorkChan chan bool
+	ticksChan      chan int
+	statusChan     chan SyncableStatus
+	startWorkChan  chan bool
+	finishWorkChan chan bool
+	stopFlagChan   chan bool
 }
 
-// New creates a new Ticker. Also it runs all agents because it essential for correct work of ticker.
+// New creates a new Ticker.
 func New(sync Syncable) *Ticker {
 	defer log.Info("New ticker initialized")
 
 	return &Ticker{
-		ticksChan:     sync.CreateTicksChan(),
-		statusChan:    sync.CreateStatusChan(),
-		startWorkChan: sync.CreateStartWorkChan(),
-		finisWorkChan: sync.CreateFinishWorkChan(),
+		ticksChan:      sync.CreateTicksChan(),
+		statusChan:     sync.CreateStatusChan(),
+		startWorkChan:  sync.CreateStartWorkChan(),
+		finishWorkChan: sync.CreateFinishWorkChan(),
+		stopFlagChan:   sync.CreateStopFlagChan(),
 	}
 }
 
 // Run starts ticker
 func (ticker *Ticker) Run() {
+MainLoop:
 	for {
 		// send new tick
 		ticker.currentTick++
@@ -55,7 +58,7 @@ func (ticker *Ticker) Run() {
 		log.WithField("tick", ticker.currentTick).Debug("Ticker: all agents became idle")
 
 		// stop work for this tick
-		ticker.finisWorkChan <- true
+		ticker.finishWorkChan <- true
 
 		// confirm that work finished
 		doneStatus := <-ticker.statusChan
@@ -63,5 +66,15 @@ func (ticker *Ticker) Run() {
 			panic("Invalid status for syncable")
 		}
 		log.WithField("tick", ticker.currentTick).Debug("Ticker: all agents finish work")
+
+		// check for stopFlag
+		select {
+		case stopFlag := <-ticker.stopFlagChan:
+			if stopFlag {
+				break MainLoop
+			}
+		default:
+		}
 	}
+	log.WithField("tick", ticker.currentTick).Info("Ticker: experiment finished")
 }

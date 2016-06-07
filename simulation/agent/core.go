@@ -44,6 +44,8 @@ func (core *Core) getControlUnit() *ControlUnit {
 }
 
 func (core *Core) run() {
+	activeTicksProcessed := 0
+
 	for {
 		core.sync.toReady()
 		core.sync.toWorking()
@@ -60,8 +62,13 @@ func (core *Core) run() {
 			<-controlUnit.requestConfirmation
 		}
 
+		if core.workload.Requests[core.sync.tick] != nil {
+			activeTicksProcessed++
+		}
+
 		core.sync.toIdle()
 		<-core.sync.toDoneCallback()
+		core.sync.SetStopFlag(activeTicksProcessed == len(core.workload.Requests))
 	}
 }
 

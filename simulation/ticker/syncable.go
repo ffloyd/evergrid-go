@@ -23,6 +23,7 @@ type Syncable interface {
 	CreateTicksChan() chan int
 	CreateStartWorkChan() chan bool
 	CreateFinishWorkChan() chan bool
+	CreateStopFlagChan() chan bool
 }
 
 // String in implementation of stringer interface

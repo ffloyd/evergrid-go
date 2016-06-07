@@ -11,6 +11,9 @@ type Synchronizer struct {
 	statusChan     chan ticker.SyncableStatus
 	startWorkChan  chan bool
 	finishWorkChan chan bool
+	stopFlagChan   chan bool
+
+	stopFlag bool
 
 	tick   int
 	status ticker.SyncableStatus
@@ -25,10 +28,15 @@ func NewSynchronizer(agentName string) *Synchronizer {
 		statusChan:     make(chan ticker.SyncableStatus),
 		startWorkChan:  make(chan bool),
 		finishWorkChan: make(chan bool),
+		stopFlagChan:   make(chan bool),
 		status:         ticker.StatusDone,
 		agentName:      agentName,
 	}
 }
+
+//
+// ticker.Syncable implementation
+//
 
 // CreateStatusChan is an implementation of ticker.Syncable interface
 func (sync *Synchronizer) CreateStatusChan() chan ticker.SyncableStatus {
@@ -50,7 +58,14 @@ func (sync *Synchronizer) CreateFinishWorkChan() chan bool {
 	return sync.finishWorkChan
 }
 
+// CreateStopFlagChan is an implementation of ticker.Syncable interface
+func (sync *Synchronizer) CreateStopFlagChan() chan bool {
+	return sync.stopFlagChan
+}
+
+//
 // to[Status] functions. Define state machine for these statuses
+//
 
 // receives new tick besides of changing status form Done to Ready
 func (sync *Synchronizer) toReady() {
@@ -142,4 +157,16 @@ func (sync *Synchronizer) toDoneCallback() chan bool {
 	}()
 
 	return result
+}
+
+//
+// StopFlag related functions
+//
+
+// SetStopFlag is only way to change stopFlag status
+func (sync *Synchronizer) SetStopFlag(to bool) {
+	if sync.stopFlag != to {
+		sync.stopFlag = to
+		sync.stopFlagChan <- to
+	}
 }

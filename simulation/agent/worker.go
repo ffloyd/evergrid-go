@@ -68,6 +68,7 @@ func (worker *Worker) run() {
 			case request := <-worker.ExecuteChan:
 				worker.executor.Prepare(request)
 			case <-doneCh:
+				worker.sync.SetStopFlag(!worker.State.IsBusy())
 				break SelectLoop
 			}
 		}
