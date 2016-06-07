@@ -78,3 +78,8 @@ MainLoop:
 	}
 	log.WithField("tick", ticker.currentTick).Info("Ticker: experiment finished")
 }
+
+// CurrentTick returns current ticker's tick
+func (ticker *Ticker) CurrentTick() int {
+	return ticker.currentTick
+}

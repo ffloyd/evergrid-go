@@ -75,7 +75,12 @@ func (sim *Simulation) initDatasetsAndProcessors() {
 	}
 }
 
+func (sim *Simulation) report() {
+	log.WithField("value", sim.ticker.CurrentTick()).Info("Report: total ticks")
+}
+
 // Run starts simulation
-func (sim Simulation) Run() {
+func (sim *Simulation) Run() {
 	sim.ticker.Run()
+	sim.report()
 }
