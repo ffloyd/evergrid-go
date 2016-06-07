@@ -10,6 +10,8 @@ const (
 	Random Algorithm = iota
 	// NaiveFastFIFO is a very simple "first in first out" implementation of scheduler focused on speed
 	NaiveFastFIFO
+	// NaiveCheapFIFO is a very simple "first in first out" implementation of scheduler focused on lower prices
+	NaiveCheapFIFO
 )
 
 // Scheduler is just a scheduler
@@ -41,6 +43,11 @@ func (sched *Scheduler) Run() {
 		impl.run()
 	case NaiveFastFIFO:
 		impl := &naiveFastFifoScheduler{
+			base: sched,
+		}
+		impl.run()
+	case NaiveCheapFIFO:
+		impl := &naiveCheapFifoScheduler{
 			base: sched,
 		}
 		impl.run()
