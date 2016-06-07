@@ -164,10 +164,10 @@ SelectLoop:
 func (unit *ControlUnit) startScheduler() {
 	log.WithFields(log.Fields{
 		"agent":     unit,
-		"algorithm": "FIFO",
+		"algorithm": "Random",
 	}).Info("Starting scheduler on Control Unit")
 
-	unit.scheduler = scheduler.New(scheduler.FIFO, unit.Name())
+	unit.scheduler = scheduler.New(scheduler.Random, unit.Name())
 	unit.monitor = startMonitor(unit.scheduler, unit.env, unit.Name())
 	go unit.scheduler.Run()
 

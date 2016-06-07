@@ -49,9 +49,10 @@ func (core *Core) run() {
 	for {
 		core.sync.toReady()
 		core.sync.toWorking()
+		controlUnit := core.getControlUnit()
 
 		for _, request := range core.workload.Requests[core.sync.tick] {
-			controlUnit := core.getControlUnit()
+
 			log.WithFields(log.Fields{
 				"tick":         core.sync.tick,
 				"agent":        core,
