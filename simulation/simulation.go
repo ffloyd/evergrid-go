@@ -89,6 +89,15 @@ func (sim *Simulation) report() {
 		totalUploadTicks += worker.State.Stats.UploadTicks
 	}
 	log.WithField("value", totalUploadTicks).Info("Report: total upload ticks on worker")
+
+	totalMoneySpent := 0.0
+	for _, worker := range sim.agents.Workers {
+		uploadTicks := float64(worker.State.Stats.UploadTicks)
+		executionTicks := float64(worker.State.Stats.ExecutionTicks)
+		moneyPerTicks := worker.State.Info().PricePerTick
+		totalMoneySpent += (uploadTicks + executionTicks) * moneyPerTicks
+	}
+	log.WithField("value", totalMoneySpent).Info("Report: total money spent")
 }
 
 // Run starts simulation

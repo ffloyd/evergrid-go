@@ -12,7 +12,7 @@ type State struct {
 }
 
 // NewState creates a new state for worker
-func NewState(name string, diskSpace types.MByte, performance types.MFlop) *State {
+func NewState(name string, diskSpace types.MByte, performance types.MFlop, price float64) *State {
 	return &State{
 		info: &types.WorkerInfo{
 			UID:            types.UID(name),
@@ -20,6 +20,7 @@ func NewState(name string, diskSpace types.MByte, performance types.MFlop) *Stat
 			MFlops:         performance,
 			TotalDiskSpace: diskSpace,
 			FreeDiskSpace:  diskSpace,
+			PricePerTick:   price,
 			Datasets:       make(map[types.UID]*types.DatasetInfo),
 			Processors:     make(map[types.UID]*types.ProcessorInfo),
 		},

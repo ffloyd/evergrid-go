@@ -26,7 +26,7 @@ type Worker struct {
 func NewWorker(config *networkcfg.AgentCfg, net *network.Network, env *Environ) *Worker {
 	worker := &Worker{
 		Base:        *NewBase(config, net, env),
-		State:       workerUtil.NewState(config.Name, config.WorkerDisk, config.WorkerMFlops),
+		State:       workerUtil.NewState(config.Name, config.WorkerDisk, config.WorkerMFlops, config.PricePerTick),
 		UploadChan:  make(chan workerUtil.ReqUpload),
 		BuildChan:   make(chan workerUtil.ReqBuild),
 		ExecuteChan: make(chan workerUtil.ReqExecute),

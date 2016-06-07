@@ -7,6 +7,7 @@ type WorkerInfo struct {
 	MFlops         MFlop
 	TotalDiskSpace MByte
 	FreeDiskSpace  MByte
+	PricePerTick   float64
 	CurrentJob     *JobInfo
 	Datasets       map[UID]*DatasetInfo
 	Processors     map[UID]*ProcessorInfo
