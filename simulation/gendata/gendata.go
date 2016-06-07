@@ -215,6 +215,7 @@ func genWorkerNode(suffix string, controlUnit string, config Config) *networkcfg
 		ControlUnit:  controlUnit,
 		WorkerDisk:   uniformDistr(config.MinDiskSize, config.MaxDiskSize),
 		WorkerMFlops: uniformDistr(config.MinNodeSpeed, config.MaxNodeSpeed),
+		PricePerTick: uniformDistrF64(config.MinPricePerTick, config.MaxPricePerTick),
 	}
 	result.Agents[0] = agentYAML
 

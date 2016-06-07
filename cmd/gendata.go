@@ -43,6 +43,8 @@ DISTDIR argument is a name of directory for generated dimdata. NAME - id a name 
 			MaxNodesInSegment: 15,
 			MinNodeSpeed:      5000,
 			MaxNodeSpeed:      20000,
+			MinPricePerTick:   1.0 / 60.0,
+			MaxPricePerTick:   10.0 / 60.0,
 			MinDiskSize:       10,
 			MaxDiskSize:       2000,
 		}

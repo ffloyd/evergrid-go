@@ -23,4 +23,6 @@ type Config struct {
 	MaxNodeSpeed      int
 	MinDiskSize       int // GBytes
 	MaxDiskSize       int
+	MinPricePerTick   float64
+	MaxPricePerTick   float64
 }

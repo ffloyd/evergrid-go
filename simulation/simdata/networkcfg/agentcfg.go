@@ -9,9 +9,10 @@ import (
 type AgentCfgYAML struct {
 	Name         string
 	Type         string
-	ControlUnit  string `yaml:"control_unit,omitempty"`
-	WorkerDisk   int    `yaml:"worker_disk,omitempty"`
-	WorkerMFlops int    `yaml:"worker_mflops,omitempty"`
+	ControlUnit  string  `yaml:"control_unit,omitempty"`
+	WorkerDisk   int     `yaml:"worker_disk,omitempty"`
+	WorkerMFlops int     `yaml:"worker_mflops,omitempty"`
+	PricePerTick float64 `yaml:"price_per_tick,omitempty"`
 }
 
 // AgentType is an enum for agent types
@@ -32,6 +33,7 @@ type AgentCfg struct {
 	ControlUnitName string
 	WorkerDisk      types.MByte
 	WorkerMFlops    types.MFlop
+	PricePerTick    float64
 
 	Node *NodeCfg // parent
 }
@@ -45,6 +47,7 @@ func (agentYAML AgentCfgYAML) Parse(parent *NodeCfg) *AgentCfg {
 		ControlUnitName: agentYAML.ControlUnit,
 		WorkerDisk:      types.MByte(agentYAML.WorkerDisk * 1024),
 		WorkerMFlops:    types.MFlop(agentYAML.WorkerMFlops),
+		PricePerTick:    agentYAML.PricePerTick,
 		Node:            parent,
 	}
 }
