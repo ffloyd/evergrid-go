@@ -7,14 +7,15 @@ type cuQueue struct {
 	workersQueues map[string]*jobQueue
 }
 
-func newCUQueue(workerNames []string) *cuQueue {
+func newCUQueue(workers []*types.WorkerInfo) *cuQueue {
 	result := &cuQueue{
 		workersQueues: make(map[string]*jobQueue),
 	}
 
-	for _, name := range workerNames {
-		result.workersQueues[name] = &jobQueue{
+	for _, info := range workers {
+		result.workersQueues[string(info.UID)] = &jobQueue{
 			queue: make([]types.JobInfo, 0, 10),
+			info:  info,
 		}
 	}
 
@@ -27,10 +28,12 @@ func (cuq *cuQueue) forWorker(workerName string) *jobQueue {
 
 type jobQueue struct {
 	queue []types.JobInfo
+	info  *types.WorkerInfo
 }
 
 func (q *jobQueue) push(job types.JobInfo) {
 	q.queue = append(q.queue, job)
+	q.info.QueueLength++
 }
 
 func (q *jobQueue) pop() *types.JobInfo {
@@ -40,5 +43,6 @@ func (q *jobQueue) pop() *types.JobInfo {
 
 	var result types.JobInfo
 	result, q.queue = q.queue[0], q.queue[1:len(q.queue)]
+	q.info.QueueLength--
 	return &result
 }

@@ -10,4 +10,5 @@ type WorkerInfo struct {
 	CurrentJob     *JobInfo
 	Datasets       map[UID]*DatasetInfo
 	Processors     map[UID]*ProcessorInfo
+	QueueLength    int
 }

@@ -180,12 +180,12 @@ func (unit *ControlUnit) startScheduler() {
 }
 
 func (unit *ControlUnit) initQueues() {
-	workerNames := make([]string, len(unit.workers))
+	workerInfos := make([]*types.WorkerInfo, len(unit.workers))
 	for i, worker := range unit.workers {
-		workerNames[i] = worker.Name()
+		workerInfos[i] = worker.State.Info()
 	}
 
-	unit.cuQueue = newCUQueue(workerNames)
+	unit.cuQueue = newCUQueue(workerInfos)
 }
 
 func (unit *ControlUnit) processQueues() {
