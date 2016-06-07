@@ -8,8 +8,8 @@ type Algorithm int
 const (
 	// Random is a scheduler, who must work worse than any meaningful other
 	Random Algorithm = iota
-	// FIFO is a simple "first in first out" implementation of scheduler
-	FIFO
+	// NaiveFastFIFO is a very simple "first in first out" implementation of scheduler focused on speed
+	NaiveFastFIFO
 )
 
 // Scheduler is just a scheduler
@@ -39,8 +39,8 @@ func (sched *Scheduler) Run() {
 			datasetLocations: make(map[types.UID]types.UID),
 		}
 		impl.run()
-	case FIFO:
-		impl := &fifoScheduler{
+	case NaiveFastFIFO:
+		impl := &naiveFastFifoScheduler{
 			base: sched,
 		}
 		impl.run()

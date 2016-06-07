@@ -167,7 +167,7 @@ func (unit *ControlUnit) startScheduler() {
 		"algorithm": "Random",
 	}).Info("Starting scheduler on Control Unit")
 
-	unit.scheduler = scheduler.New(scheduler.Random, unit.Name())
+	unit.scheduler = scheduler.New(scheduler.NaiveFastFIFO, unit.Name())
 	unit.monitor = startMonitor(unit.scheduler, unit.env, unit.Name())
 	go unit.scheduler.Run()
 
