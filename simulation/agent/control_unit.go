@@ -6,6 +6,7 @@ import (
 	log "github.com/Sirupsen/logrus"
 	"github.com/ffloyd/evergrid-go/global/types"
 	"github.com/ffloyd/evergrid-go/scheduler"
+	workerUtil "github.com/ffloyd/evergrid-go/simulation/agent/worker"
 	"github.com/ffloyd/evergrid-go/simulation/network"
 	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
 	"github.com/ffloyd/evergrid-go/simulation/simdata/workloadcfg"
@@ -190,7 +191,7 @@ func (unit *ControlUnit) initQueues() {
 func (unit *ControlUnit) processQueues() {
 	for workerName, queue := range unit.cuQueue.workersQueues {
 		worker := unit.env.Workers[workerName]
-		if worker.State.Busy {
+		if worker.State.IsBusy() {
 			continue
 		}
 
@@ -201,11 +202,15 @@ func (unit *ControlUnit) processQueues() {
 
 		switch nextJob.Type {
 		case types.JobUploadDataset:
-			worker.NewUpload <- unit.env.Datasets[string(nextJob.Dataset)]
+			worker.UploadChan <- workerUtil.ReqUpload{
+				Dataset: unit.env.Datasets[string(nextJob.Dataset)],
+			}
 		case types.JobBuildProcessor:
-			worker.NewProcessorBuild <- unit.env.Processors[string(nextJob.Processor)]
+			worker.BuildChan <- workerUtil.ReqBuild{
+				Processor: unit.env.Processors[string(nextJob.Processor)],
+			}
 		case types.JobRunProcessor:
-			worker.NewProcessorRun <- WorkerRunProcessorRequest{
+			worker.ExecuteChan <- workerUtil.ReqExecute{
 				Processor: unit.env.Processors[string(nextJob.Processor)],
 				Dataset:   unit.env.Datasets[string(nextJob.Dataset)],
 			}
