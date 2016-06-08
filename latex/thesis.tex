@@ -1,4 +1,5 @@
 \documentclass[%
+12pt,
 master,         % тип документа
 natbib,         % использовать пакет natbib для "сжатия" цитирований
 subf,           % использовать пакет subcaption для вложенной нумерации рисунков
@@ -8,9 +9,11 @@ colorlinks=true % цветные гиперссылки
 %,times         % шрифт Times как основной
 ]{disser}
 
+% Original: left - 2.5, right - 1, baseline untouched
+\renewcommand{\baselinestretch}{1.5}
 \usepackage[
   a4paper, mag=1000,
-  left=2.5cm, right=1cm, top=2cm, bottom=2cm, headsep=0.7cm, footskip=1cm
+  left=3cm, right=2cm, top=2cm, bottom=2cm, headsep=0.7cm, footskip=1cm
 ]{geometry}
 \usepackage[T2A]{fontenc}
 \usepackage[utf8]{inputenc}
@@ -50,7 +53,7 @@ colorlinks=true % цветные гиперссылки
 
 \title{ДИССЕРТАЦИЯ\\[-14pt]на соискание ученой степени\\МАГИСТРА}
 
-\topic{Разработка алгоритма оптимального распределения задач и данных по ресурсам облачных инфраструктур}
+\topic{Разработка модели среды распределенных вычислений Evergrid для сравнения алгоритмов управления потоками задач и данных}
 
 % Автор
 \author       {Колеснев Роман Владимирович} % ФИО
@@ -65,8 +68,8 @@ colorlinks=true % цветные гиперссылки
 \sastatus{к.~ф.-м.~н., доцент}
 
 % Рецензент
-\rev      {???}
-\revstatus{д.~ф.-м.~н., в.~н.~с.???}
+\rev      {Рыков Владимир Васильевич}
+\revstatus{к.~л. ~н., доцент}
 % Второй рецензент
 %\revsnd      {ФИО рецензента}
 %\revsndstatus{д.~т.~н., ст.~н.~с.}
@@ -90,10 +93,20 @@ colorlinks=true % цветные гиперссылки
 \tableofcontents
 % Введение
 \input{intro}
-% Глава 1
+% Глава 1 - Постановка глобальной задачи
 \input{ch1}
-% Глава 2
-%\input{2}
+% Глава 2 - Постановка решаемых в дипломе задач
+\input{ch2} 
+% Глава 3 - Архитектура продукта
+\input{ch3}
+% Глава 4 - Требования к среде моделирования
+\input{ch4}
+% Глава 5 - Анализ возможных реализаций
+\input{ch5}
+% Глава 6 - Описание созданной системы
+\input{ch6}
+% Глава 7 - Технические детали созданной системы
+\input{ch7}
 
 % Заключение
 \input{concl}
