@@ -3,19 +3,34 @@ package simenv
 // Ok -
 type Ok struct{}
 
-// AgentStatus - represent statuses for Syncable
-type AgentStatus int
+// AgentState - represent statuses for Syncable
+type AgentState int
 
 const (
-	// StatusReady - means that new tick received
-	StatusReady AgentStatus = iota
+	// StateReady - means that new tick received
+	StateReady AgentState = iota
 
-	// StatusWorking - means that current entity doing some work now
-	StatusWorking
+	// StateWorking - means that current entity doing some work now
+	StateWorking
 
-	// StatusIdle - means that current entity active and waits for interactions from other entities
-	StatusIdle
+	// StateIdle - means that current entity active and waits for interactions from other entities
+	StateIdle
 
-	// StatusDone - means that current entity finished all possible work for current tick
-	StatusDone
+	// StateDone - means that current entity finished all possible work for current tick
+	StateDone
 )
+
+func (state AgentState) String() string {
+	switch state {
+	case StateReady:
+		return "StateReady"
+	case StateWorking:
+		return "StateWorking"
+	case StateIdle:
+		return "StateIdle"
+	case StateDone:
+		return "StateDone"
+	default:
+		panic("Unknown state value")
+	}
+}

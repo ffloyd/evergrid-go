@@ -3,6 +3,6 @@ package simenv
 // Agent -
 type Agent interface {
 	Name() string
-	Run(*AgentGroup) AgentChans
+	Run(*SimEnv) AgentChans
 	Send(interface{}) chan interface{}
 }

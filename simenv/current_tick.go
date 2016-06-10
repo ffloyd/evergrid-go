@@ -1,5 +1,7 @@
 package simenv
 
+import "strconv"
+
 /*
 CurrentTick представляет из себя число, которое синхронизируется с SimEnv и
 всегда содержит актуальное значение tick'а.
@@ -11,7 +13,9 @@ CurrentTick представляет из себя число, которое с
 Единственный корректный способ инициализоровать эту структуру - это использовать
 cоответсвующий метод SimEnv'а.
 */
-type CurrentTick int
+type CurrentTick struct {
+	tick int
+}
 
 func (ct *CurrentTick) connect(ch chan int) {
 	for {
@@ -19,6 +23,10 @@ func (ct *CurrentTick) connect(ch chan int) {
 		if nextVal == -1 {
 			break
 		}
-		*ct = CurrentTick(nextVal)
+		ct.tick = nextVal
 	}
+}
+
+func (ct CurrentTick) String() string {
+	return strconv.Itoa(ct.tick)
 }

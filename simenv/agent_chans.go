@@ -4,8 +4,7 @@ package simenv
 AgentChans -
 */
 type AgentChans struct {
-	ticksChan      chan int
-	statusChan     chan AgentStatus
+	statusChan     chan AgentState
 	startWorkChan  chan Ok
 	finishWorkChan chan Ok
 	stopFlagChan   chan bool
@@ -14,8 +13,7 @@ type AgentChans struct {
 // NewAgentChans -
 func NewAgentChans() AgentChans {
 	return AgentChans{
-		ticksChan:      make(chan int),
-		statusChan:     make(chan AgentStatus),
+		statusChan:     make(chan AgentState),
 		startWorkChan:  make(chan Ok),
 		finishWorkChan: make(chan Ok),
 		stopFlagChan:   make(chan bool),
