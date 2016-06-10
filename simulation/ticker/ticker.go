@@ -8,11 +8,9 @@ import (
 type Ticker struct {
 	currentTick int
 
-	ticksChan      chan int
-	statusChan     chan SyncableStatus
-	startWorkChan  chan bool
-	finishWorkChan chan bool
-	stopFlagChan   chan bool
+	ctStructsChans []chan int
+
+	SyncChans
 }
 
 // New creates a new Ticker.
@@ -20,11 +18,13 @@ func New(sync Syncable) *Ticker {
 	defer log.Info("New ticker initialized")
 
 	return &Ticker{
-		ticksChan:      sync.CreateTicksChan(),
-		statusChan:     sync.CreateStatusChan(),
-		startWorkChan:  sync.CreateStartWorkChan(),
-		finishWorkChan: sync.CreateFinishWorkChan(),
-		stopFlagChan:   sync.CreateStopFlagChan(),
+		SyncChans: SyncChans{
+			ticksChan:      sync.CreateTicksChan(),
+			statusChan:     sync.CreateStatusChan(),
+			startWorkChan:  sync.CreateStartWorkChan(),
+			finishWorkChan: sync.CreateFinishWorkChan(),
+			stopFlagChan:   sync.CreateStopFlagChan(),
+		},
 	}
 }
 
@@ -34,6 +34,11 @@ MainLoop:
 	for {
 		// send new tick
 		ticker.currentTick++
+
+		for _, ctChan := range ticker.ctStructsChans {
+			ctChan <- ticker.currentTick
+		}
+
 		log.WithField("tick", ticker.currentTick).Debug("Ticker: new tick")
 		ticker.ticksChan <- ticker.currentTick
 
@@ -77,9 +82,25 @@ MainLoop:
 		}
 	}
 	log.WithField("tick", ticker.currentTick).Info("Ticker: experiment finished")
+
+	for _, ctChan := range ticker.ctStructsChans {
+		ctChan <- -1
+	}
+}
+
+// LogContext -
+func (ticker *Ticker) LogContext() *log.Entry {
+	return log.WithField("tick", ticker.CurrentTick())
 }
 
 // CurrentTick returns current ticker's tick
-func (ticker *Ticker) CurrentTick() int {
-	return ticker.currentTick
+func (ticker *Ticker) CurrentTick() CurrentTick {
+	ct := CurrentTick(ticker.currentTick)
+	channel := make(chan int)
+
+	ticker.ctStructsChans = append(ticker.ctStructsChans, channel)
+
+	go ct.connect(channel)
+
+	return ct
 }
