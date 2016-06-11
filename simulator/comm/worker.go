@@ -11,3 +11,6 @@ type WorkerUploadDataset struct {
 type WorkerBuildCalculator struct {
 	Calculator types.CalculatorInfo
 }
+
+// WorkerBusy -
+type WorkerBusy struct{}

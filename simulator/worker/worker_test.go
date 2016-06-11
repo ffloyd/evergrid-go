@@ -11,13 +11,31 @@ import (
 	"github.com/ffloyd/evergrid-go/simulator/worker"
 )
 
+func uploadDatasetRequest(datasetName string, datasetSize types.MByte) comm.WorkerUploadDataset {
+	return comm.WorkerUploadDataset{
+		Dataset: types.DatasetInfo{
+			UID:  datasetName,
+			Size: datasetSize,
+		},
+	}
+}
+
+func buildCalculatorRequest(calculatorName string, mflopsPerMb types.MFlop) comm.WorkerBuildCalculator {
+	return comm.WorkerBuildCalculator{
+		Calculator: types.CalculatorInfo{
+			UID:         calculatorName,
+			MFlopsPerMb: mflopsPerMb,
+		},
+	}
+}
+
 func testWorker(requests []interface{}, context string) *worker.Worker {
 	config := networkcfg.AgentCfg{
 		Name:            "Worker 1",
 		Type:            networkcfg.AgentWorker,
 		ControlUnitName: "",
 		WorkerDisk:      100 * 1024,
-		WorkerMFlops:    100,
+		WorkerMFlops:    10000,
 		PricePerTick:    10.0,
 	}
 
@@ -35,12 +53,9 @@ func testWorker(requests []interface{}, context string) *worker.Worker {
 }
 
 func TestUploading(t *testing.T) {
-	requests := []interface{}{comm.WorkerUploadDataset{
-		Dataset: types.DatasetInfo{
-			UID:  "Dataset 1",
-			Size: 1000,
-		},
-	}}
+	requests := []interface{}{
+		uploadDatasetRequest("Dataset 1", 1000),
+	}
 
 	worker := testWorker(requests, "upload_dataset")
 	if worker.Stats().UploadingTicks != 2 {
@@ -50,12 +65,7 @@ func TestUploading(t *testing.T) {
 
 func TestBuilding(t *testing.T) {
 	requests := []interface{}{
-		comm.WorkerBuildCalculator{
-			Calculator: types.CalculatorInfo{
-				UID:         "Calculator 1",
-				MFlopsPerMb: 1000,
-			},
-		},
+		buildCalculatorRequest("Calculator 1", 100),
 	}
 
 	worker := testWorker(requests, "build_calculator")

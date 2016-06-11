@@ -3,6 +3,7 @@ package worker_test
 import (
 	"github.com/Sirupsen/logrus"
 	"github.com/ffloyd/evergrid-go/simenv"
+	"github.com/ffloyd/evergrid-go/simulator/comm"
 )
 
 type SenderAgent struct {
@@ -45,13 +46,22 @@ func (sa *SenderAgent) Send(msg interface{}) chan interface{} {
 
 func (sa *SenderAgent) work() {
 	reqIndex := 0
+	worker := sa.simenv.Find(sa.workerName)
 
 	for {
 		sa.fsm.ToReady()
 		sa.fsm.ToWorking()
 		if reqIndex < len(sa.requests) {
-			<-sa.simenv.Find(sa.workerName).Send(sa.requests[reqIndex])
-			reqIndex++
+			busyStatus := <-worker.Send(comm.WorkerBusy{})
+			switch value := busyStatus.(type) {
+			case bool:
+				if !value {
+					<-worker.Send(sa.requests[reqIndex])
+					reqIndex++
+				}
+			default:
+				sa.log.Panic("Invalid worker response")
+			}
 		} else {
 			sa.fsm.SetStopFlag(true)
 		}

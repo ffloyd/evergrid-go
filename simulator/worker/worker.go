@@ -82,22 +82,30 @@ func (worker *Worker) Run(env *simenv.SimEnv) simenv.AgentChans {
 func (worker *Worker) Send(msg interface{}) chan interface{} {
 	worker.sendLock.Lock()
 	worker.fsm.ToWorking()
+
+	var responseMsg interface{}
+	responseMsg = simenv.Ok{}
+
 	switch request := msg.(type) {
 	case comm.WorkerUploadDataset:
+		worker.busyCheck()
 		worker.uploader.Prepare(request)
 	case comm.WorkerBuildCalculator:
+		worker.busyCheck()
 		worker.builder.Prepare(request)
+	case comm.WorkerBusy:
+		responseMsg = worker.busy
 	default:
 		worker.log.Panicf("Unknown request type: %v", request)
 	}
 
-	response := make(chan interface{})
+	responseChan := make(chan interface{})
 	go func() {
 		worker.fsm.ToIdle()
-		response <- simenv.Ok{}
+		responseChan <- responseMsg
 		worker.sendLock.Unlock()
 	}()
-	return response
+	return responseChan
 }
 
 func (worker *Worker) work() {
@@ -114,5 +122,11 @@ func (worker *Worker) work() {
 		<-worker.fsm.ToDoneChan()
 
 		worker.sendLock.Lock()
+	}
+}
+
+func (worker *Worker) busyCheck() {
+	if worker.busy {
+		worker.log.Panic("Incorrect request to busy worker")
 	}
 }
