@@ -79,7 +79,7 @@ func (state *genDataState) genFilenames(config Config) {
 
 func (state *genDataState) genData(config Config) {
 	log.WithFields(log.Fields{
-		"processors":          config.ProcessorsCount,
+		"processors":          config.CalculatorsCount,
 		"datasets":            config.DatsetsCount,
 		"min_dataset_size":    config.MinDatasetSize,
 		"max_dataset_size":    config.MaxDatasetSize,
@@ -91,7 +91,7 @@ func (state *genDataState) genData(config Config) {
 
 	data.Name = state.dataFilename
 	data.Datasets = make([]datacfg.DatasetCfgYAML, config.DatsetsCount)
-	data.Processors = make([]datacfg.ProcessorCfgYAML, config.ProcessorsCount)
+	data.Calculators = make([]datacfg.CalculatorCfgYAML, config.CalculatorsCount)
 
 	for i := 0; i < config.DatsetsCount; i++ {
 		data.Datasets[i] = datacfg.DatasetCfgYAML{
@@ -100,8 +100,8 @@ func (state *genDataState) genData(config Config) {
 		}
 	}
 
-	for i := 0; i < config.ProcessorsCount; i++ {
-		data.Processors[i] = datacfg.ProcessorCfgYAML{
+	for i := 0; i < config.CalculatorsCount; i++ {
+		data.Calculators[i] = datacfg.CalculatorCfgYAML{
 			Name:        fmt.Sprintf("Processor %d", i),
 			MFlopsPerMb: float64(uniformDistr(config.MinSpeed, config.MaxSpeed)),
 		}
@@ -112,7 +112,7 @@ func (state *genDataState) genData(config Config) {
 
 func (state *genDataState) genWorkload(config Config) {
 	log.WithFields(log.Fields{
-		"processor_runs":  config.ProcessorRuns,
+		"processor_runs":  config.CalculatorRuns,
 		"run_probability": config.RunProbability,
 	}).Info("Generating workload...")
 
@@ -122,20 +122,20 @@ func (state *genDataState) genWorkload(config Config) {
 	workload.Requests = make(map[int][]workloadcfg.RequestCfgYAML)
 
 	datasetUploaded := make([]bool, config.DatsetsCount)
-	processorsUploaded := make([]bool, config.ProcessorsCount)
+	calculatorsUploaded := make([]bool, config.CalculatorsCount)
 
 	addRequest := func(tick int, request workloadcfg.RequestCfgYAML) {
 		workload.Requests[tick] = append(workload.Requests[tick], request)
 	}
 
-	eventsLeft := config.ProcessorRuns
+	eventsLeft := config.CalculatorRuns
 	tick := 1
 	for ; eventsLeft > 0; tick++ {
 		if !coin(config.RunProbability) {
 			continue
 		}
 
-		datasetIndex, processorIndex := rand.Intn(config.DatsetsCount), rand.Intn(config.ProcessorsCount)
+		datasetIndex, calculatorIndex := rand.Intn(config.DatsetsCount), rand.Intn(config.CalculatorsCount)
 		if !datasetUploaded[datasetIndex] {
 			addRequest(tick, workloadcfg.RequestCfgYAML{
 				Type:    "upload_dataset",
@@ -145,11 +145,11 @@ func (state *genDataState) genWorkload(config Config) {
 		}
 
 		addRequest(tick, workloadcfg.RequestCfgYAML{
-			Type:      "run_expirement",
-			Processor: state.dataYAML.Processors[processorIndex].Name,
-			Dataset:   state.dataYAML.Datasets[datasetIndex].Name,
+			Type:       "run_expirement",
+			Calculator: state.dataYAML.Calculators[calculatorIndex].Name,
+			Dataset:    state.dataYAML.Datasets[datasetIndex].Name,
 		})
-		processorsUploaded[processorIndex] = true
+		calculatorsUploaded[calculatorIndex] = true
 
 		eventsLeft--
 	}

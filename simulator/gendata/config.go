@@ -9,11 +9,11 @@ type Config struct {
 	MinDatasetSize int // in GBytes
 	MaxDatasetSize int
 
-	ProcessorsCount int // in MFlopsPerMb
-	MinSpeed        int
-	MaxSpeed        int
+	CalculatorsCount int // in MFlopsPerMb
+	MinSpeed         int
+	MaxSpeed         int
 
-	ProcessorRuns  int
+	CalculatorRuns int
 	RunProbability float64 // probability of task execution per tick
 
 	NetworkSegments   int

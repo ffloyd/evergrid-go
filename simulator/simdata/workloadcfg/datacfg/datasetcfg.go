@@ -10,14 +10,14 @@ type DatasetCfgYAML struct {
 
 // DatasetCfg is a representation of dataset in data config
 type DatasetCfg struct {
-	DatasetCfgYAML
+	Name string
+	Size int
 }
 
 // Info returns types.DatasetInfo representation
 func (conf *DatasetCfg) Info() *types.DatasetInfo {
 	return &types.DatasetInfo{
-		UID:     types.UID(conf.Name),
-		Size:    types.MByte(conf.Size * 1024),
-		Workers: make([]types.UID, 0),
+		UID:  conf.Name,
+		Size: types.MByte(conf.Size * 1024),
 	}
 }

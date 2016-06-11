@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ffloyd/evergrid-go/simulation/gendata"
+	"github.com/ffloyd/evergrid-go/simulator/gendata"
 	"github.com/spf13/cobra"
 )
 
@@ -31,11 +31,11 @@ DISTDIR argument is a name of directory for generated dimdata. NAME - id a name 
 			MinDatasetSize: 1,
 			MaxDatasetSize: 20,
 
-			ProcessorsCount: 20,
-			MinSpeed:        2000,
-			MaxSpeed:        20000,
+			CalculatorsCount: 20,
+			MinSpeed:         2000,
+			MaxSpeed:         20000,
 
-			ProcessorRuns:  100,
+			CalculatorRuns: 100,
 			RunProbability: 0.07,
 
 			NetworkSegments:   3,

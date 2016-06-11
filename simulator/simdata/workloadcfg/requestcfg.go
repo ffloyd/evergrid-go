@@ -6,16 +6,16 @@ import (
 
 // RequestCfgYAML is for parse requests segments in workload YAML config
 type RequestCfgYAML struct {
-	Type      string
-	Dataset   string
-	Processor string
+	Type       string
+	Dataset    string
+	Calculator string
 }
 
 // RequestCfg is a representation of request in workload config
 type RequestCfg struct {
-	Type      string
-	Dataset   *datacfg.DatasetCfg
-	Processor *datacfg.ProcessorCfg
+	Type       string
+	Dataset    *datacfg.DatasetCfg
+	Calculator *datacfg.CalculatorCfg
 }
 
 // Parse transforms RequestCfgYAML to RequestCfg
@@ -28,8 +28,8 @@ func (requestYAML RequestCfgYAML) Parse(dataCfg *datacfg.DataCfg) *RequestCfg {
 		requestCfg.Dataset = dataCfg.Datasets[requestYAML.Dataset]
 	}
 
-	if len(requestYAML.Processor) > 0 {
-		requestCfg.Processor = dataCfg.Processors[requestYAML.Processor]
+	if len(requestYAML.Calculator) > 0 {
+		requestCfg.Calculator = dataCfg.Calculators[requestYAML.Calculator]
 	}
 
 	return requestCfg

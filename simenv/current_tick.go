@@ -30,3 +30,8 @@ func (ct *CurrentTick) connect(ch chan int) {
 func (ct CurrentTick) String() string {
 	return strconv.Itoa(ct.tick)
 }
+
+// Int -
+func (ct CurrentTick) Int() int {
+	return ct.tick
+}

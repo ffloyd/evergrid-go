@@ -11,16 +11,16 @@ import (
 
 // YAML is a representation of data yaml file
 type YAML struct {
-	Name       string
-	Datasets   []DatasetCfgYAML
-	Processors []ProcessorCfgYAML
+	Name        string
+	Datasets    []DatasetCfgYAML
+	Calculators []CalculatorCfgYAML
 }
 
 // DataCfg is a representation of data config
 type DataCfg struct {
-	Name       string
-	Datasets   map[string]*DatasetCfg
-	Processors map[string]*ProcessorCfg
+	Name        string
+	Datasets    map[string]*DatasetCfg
+	Calculators map[string]*CalculatorCfg
 }
 
 // Load parses data yaml file
@@ -34,19 +34,25 @@ func Load(dataFilename string) *DataCfg {
 	yaml.Unmarshal(rawYAML, configYAML)
 
 	dataCfg := &DataCfg{
-		Name:       configYAML.Name,
-		Datasets:   make(map[string]*DatasetCfg),
-		Processors: make(map[string]*ProcessorCfg),
+		Name:        configYAML.Name,
+		Datasets:    make(map[string]*DatasetCfg),
+		Calculators: make(map[string]*CalculatorCfg),
 	}
 
 	for _, datasetYAML := range configYAML.Datasets {
-		datasetCfg := &DatasetCfg{datasetYAML}
+		datasetCfg := &DatasetCfg{
+			Name: datasetYAML.Name,
+			Size: datasetYAML.Size,
+		}
 		dataCfg.Datasets[datasetCfg.Name] = datasetCfg
 	}
 
-	for _, processorYAML := range configYAML.Processors {
-		processorCfg := &ProcessorCfg{processorYAML}
-		dataCfg.Processors[processorCfg.Name] = processorCfg
+	for _, processorYAML := range configYAML.Calculators {
+		processorCfg := &CalculatorCfg{
+			Name:        processorYAML.Name,
+			MFlopsPerMb: processorYAML.MFlopsPerMb,
+		}
+		dataCfg.Calculators[processorCfg.Name] = processorCfg
 	}
 
 	absPath, e := filepath.Abs(dataFilename)

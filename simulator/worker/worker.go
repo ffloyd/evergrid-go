@@ -37,6 +37,10 @@ type Worker struct {
 
 // New -
 func New(cfg networkcfg.AgentCfg, logContext *logrus.Entry) *Worker {
+	if cfg.Type != networkcfg.AgentWorker {
+		logContext.Panic("Wrong agent type in config")
+	}
+
 	return &Worker{
 		name: cfg.Name,
 		log:  logContext,
@@ -62,18 +66,18 @@ func (worker *Worker) Stats() Stats {
 
 // Run -
 func (worker *Worker) Run(env *simenv.SimEnv) simenv.AgentChans {
-	logContext := worker.log.WithFields(logrus.Fields{
+	worker.log = worker.log.WithFields(logrus.Fields{
 		"agent": worker.Name(),
 		"tick":  env.CurrentTick(),
 	})
 
 	worker.simenv = env
 	worker.controlUnit = env.Find(worker.controlUnitName)
-	worker.fsm = simenv.NewAgentFSM(logContext)
+	worker.fsm = simenv.NewAgentFSM(worker.log)
 
-	worker.uploader = newUploader(worker, logContext)
-	worker.builder = newBuilder(worker, logContext)
-	worker.executor = newExecutor(worker, logContext)
+	worker.uploader = newUploader(worker, worker.log)
+	worker.builder = newBuilder(worker, worker.log)
+	worker.executor = newExecutor(worker, worker.log)
 
 	worker.sendLock.Lock()
 	go worker.work()
