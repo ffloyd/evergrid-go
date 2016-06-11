@@ -6,3 +6,8 @@ import "github.com/ffloyd/evergrid-go/global/types"
 type WorkerUploadDataset struct {
 	Dataset types.DatasetInfo
 }
+
+// WorkerBuildCalculator -
+type WorkerBuildCalculator struct {
+	Calculator types.CalculatorInfo
+}

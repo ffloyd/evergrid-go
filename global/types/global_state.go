@@ -4,7 +4,7 @@ package types
 type GlobalState struct {
 	ControlUnits map[UID]*ControlUnitInfo
 	Datasets     map[UID]*DatasetInfo
-	Processors   map[UID]*ProcessorInfo
+	Calculators  map[UID]*CalculatorInfo
 	Workers      map[UID]*WorkerInfo
 
 	ActiveJobs map[UID]*JobInfo
@@ -15,7 +15,7 @@ func NewGlobalState() *GlobalState {
 	return &GlobalState{
 		ControlUnits: make(map[UID]*ControlUnitInfo),
 		Datasets:     make(map[UID]*DatasetInfo),
-		Processors:   make(map[UID]*ProcessorInfo),
+		Calculators:  make(map[UID]*CalculatorInfo),
 		Workers:      make(map[UID]*WorkerInfo),
 
 		ActiveJobs: make(map[UID]*JobInfo),

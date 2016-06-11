@@ -29,6 +29,7 @@ type Worker struct {
 	busy     bool
 
 	uploader uploader
+	builder  builder
 
 	stats Stats
 }
@@ -70,6 +71,7 @@ func (worker *Worker) Run(env *simenv.SimEnv) simenv.AgentChans {
 	worker.fsm = simenv.NewAgentFSM(logContext)
 
 	worker.uploader = newUploader(worker, logContext)
+	worker.builder = newBuilder(worker, logContext)
 
 	worker.sendLock.Lock()
 	go worker.work()
@@ -83,6 +85,8 @@ func (worker *Worker) Send(msg interface{}) chan interface{} {
 	switch request := msg.(type) {
 	case comm.WorkerUploadDataset:
 		worker.uploader.Prepare(request)
+	case comm.WorkerBuildCalculator:
+		worker.builder.Prepare(request)
 	default:
 		worker.log.Panicf("Unknown request type: %v", request)
 	}
@@ -100,11 +104,15 @@ func (worker *Worker) work() {
 	worker.fsm.SetStopFlag(true)
 	for {
 		worker.fsm.ToReady()
+
 		worker.fsm.ToWorking()
 		worker.uploader.Process()
+		worker.builder.Process()
 		worker.fsm.ToIdle()
+
 		worker.sendLock.Unlock()
 		<-worker.fsm.ToDoneChan()
+
 		worker.sendLock.Lock()
 	}
 }

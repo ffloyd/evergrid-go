@@ -10,6 +10,6 @@ type WorkerInfo struct {
 	PricePerTick   float64
 	CurrentJob     *JobInfo
 	Datasets       map[UID]*DatasetInfo
-	Processors     map[UID]*ProcessorInfo
+	Processors     map[UID]*CalculatorInfo
 	QueueLength    int
 }

@@ -45,6 +45,7 @@ func (up *uploader) Prepare(request comm.WorkerUploadDataset) {
 	_, hasDataset := up.uploadedDatasets[dataset.UID]
 	if hasDataset {
 		up.log.WithField("dataset", dataset.UID).Info("Dataset already present on worker")
+		return
 	}
 
 	up.worker.busy = true

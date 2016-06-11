@@ -11,7 +11,7 @@ import (
 	"github.com/ffloyd/evergrid-go/simulator/worker"
 )
 
-func testWorker(requests []interface{}) *worker.Worker {
+func testWorker(requests []interface{}, context string) *worker.Worker {
 	config := networkcfg.AgentCfg{
 		Name:            "Worker 1",
 		Type:            networkcfg.AgentWorker,
@@ -21,7 +21,7 @@ func testWorker(requests []interface{}) *worker.Worker {
 		PricePerTick:    10.0,
 	}
 
-	logContext := logrus.WithField("ctx", "upload_test")
+	logContext := logrus.WithField("ctx", context)
 
 	worker := worker.New(config, logContext)
 
@@ -42,8 +42,24 @@ func TestUploading(t *testing.T) {
 		},
 	}}
 
-	worker := testWorker(requests)
+	worker := testWorker(requests, "upload_dataset")
 	if worker.Stats().UploadingTicks != 2 {
+		t.Fail()
+	}
+}
+
+func TestBuilding(t *testing.T) {
+	requests := []interface{}{
+		comm.WorkerBuildCalculator{
+			Calculator: types.CalculatorInfo{
+				UID:         "Calculator 1",
+				MFlopsPerMb: 1000,
+			},
+		},
+	}
+
+	worker := testWorker(requests, "build_calculator")
+	if worker.Stats().BuildingTicks != 1 {
 		t.Fail()
 	}
 }
