@@ -12,5 +12,11 @@ type WorkerBuildCalculator struct {
 	Calculator types.CalculatorInfo
 }
 
+// WorkerRunCalculator -
+type WorkerRunCalculator struct {
+	Calculator string
+	Dataset    string
+}
+
 // WorkerBusy -
 type WorkerBusy struct{}

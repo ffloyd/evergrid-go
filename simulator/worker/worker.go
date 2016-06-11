@@ -30,6 +30,7 @@ type Worker struct {
 
 	uploader uploader
 	builder  builder
+	executor executor
 
 	stats Stats
 }
@@ -72,6 +73,7 @@ func (worker *Worker) Run(env *simenv.SimEnv) simenv.AgentChans {
 
 	worker.uploader = newUploader(worker, logContext)
 	worker.builder = newBuilder(worker, logContext)
+	worker.executor = newExecutor(worker, logContext)
 
 	worker.sendLock.Lock()
 	go worker.work()
@@ -93,6 +95,9 @@ func (worker *Worker) Send(msg interface{}) chan interface{} {
 	case comm.WorkerBuildCalculator:
 		worker.busyCheck()
 		worker.builder.Prepare(request)
+	case comm.WorkerRunCalculator:
+		worker.busyCheck()
+		worker.executor.Prepare(request)
 	case comm.WorkerBusy:
 		responseMsg = worker.busy
 	default:
@@ -116,6 +121,7 @@ func (worker *Worker) work() {
 		worker.fsm.ToWorking()
 		worker.uploader.Process()
 		worker.builder.Process()
+		worker.executor.Process()
 		worker.fsm.ToIdle()
 
 		worker.sendLock.Unlock()

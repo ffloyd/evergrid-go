@@ -29,6 +29,13 @@ func buildCalculatorRequest(calculatorName string, mflopsPerMb types.MFlop) comm
 	}
 }
 
+func runCalculatorRequest(calculatorName string, datasetName string) comm.WorkerRunCalculator {
+	return comm.WorkerRunCalculator{
+		Calculator: calculatorName,
+		Dataset:    datasetName,
+	}
+}
+
 func testWorker(requests []interface{}, context string) *worker.Worker {
 	config := networkcfg.AgentCfg{
 		Name:            "Worker 1",
@@ -65,11 +72,24 @@ func TestUploading(t *testing.T) {
 
 func TestBuilding(t *testing.T) {
 	requests := []interface{}{
-		buildCalculatorRequest("Calculator 1", 100),
+		buildCalculatorRequest("Calculator 1", 1000),
 	}
 
 	worker := testWorker(requests, "build_calculator")
 	if worker.Stats().BuildingTicks != 1 {
+		t.Fail()
+	}
+}
+
+func TestCalculating(t *testing.T) {
+	requests := []interface{}{
+		uploadDatasetRequest("Dataset 1", 1000),
+		buildCalculatorRequest("Calculator 1", 1000),
+		runCalculatorRequest("Calculator 1", "Dataset 1"),
+	}
+
+	worker := testWorker(requests, "run_calculator")
+	if worker.Stats().CalculatingTicks != 2 {
 		t.Fail()
 	}
 }

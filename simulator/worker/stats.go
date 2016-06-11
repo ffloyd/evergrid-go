@@ -2,6 +2,7 @@ package worker
 
 // Stats -
 type Stats struct {
-	UploadingTicks int
-	BuildingTicks  int
+	UploadingTicks   int
+	BuildingTicks    int
+	CalculatingTicks int
 }
