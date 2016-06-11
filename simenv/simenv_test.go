@@ -7,7 +7,7 @@ func TestSimEnvWithFewSimpleAgents(t *testing.T) {
 	agent2 := NewSimpleAgent("2")
 	agent3 := NewSimpleAgent("3")
 
-	se := NewSimEnv()
+	se := New()
 	se.Add(agent1, agent2, agent3)
 	se.Run()
 

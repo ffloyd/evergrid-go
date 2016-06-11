@@ -1,7 +1,7 @@
 package workloadcfg
 
 import (
-	"github.com/ffloyd/evergrid-go/simulation/simdata/workloadcfg/datacfg"
+	"github.com/ffloyd/evergrid-go/simulator/simdata/workloadcfg/datacfg"
 )
 
 // RequestCfgYAML is for parse requests segments in workload YAML config

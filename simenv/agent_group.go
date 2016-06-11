@@ -99,7 +99,7 @@ func (group *agentGroup) statusChanWorker() {
 
 		similarAfter := isSimilar()
 
-		if similarBefore == false && similarAfter == true {
+		if (similarBefore == false && similarAfter == true) || (len(group.statuses) == 1) {
 			group.stateChange <- value
 		}
 	}

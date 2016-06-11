@@ -10,8 +10,8 @@ type SimEnv struct {
 	inProgress    bool
 }
 
-// NewSimEnv -
-func NewSimEnv() *SimEnv {
+// New -
+func New() *SimEnv {
 	return &SimEnv{
 		agents: make(map[string]Agent),
 	}
@@ -22,6 +22,11 @@ func (simenv *SimEnv) Add(agents ...Agent) {
 	for _, agent := range agents {
 		simenv.agents[agent.Name()] = agent
 	}
+}
+
+// Find -
+func (simenv SimEnv) Find(agentName string) Agent {
+	return simenv.agents[agentName]
 }
 
 // Run -

@@ -4,16 +4,16 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ffloyd/evergrid-go/simulation"
+	"github.com/ffloyd/evergrid-go/simulator"
 	"github.com/spf13/cobra"
 )
 
 // simulationCmd represents the simulation command
-var simulationCmd = &cobra.Command{
-	Use:       "simulation SIMDATA",
+var simulatorCmd = &cobra.Command{
+	Use:       "simulator SIMDATA",
 	Aliases:   []string{"sim", "s"},
 	ValidArgs: []string{"INFRASTRUCTURE"},
-	Short:     "Starts simulation with given options",
+	Short:     "Starts simulator with given options",
 	Long: `Starts simulation with given infracstructure.
 
 SIMDATA argument is a name of YAML file with simdata config.`,
@@ -22,13 +22,13 @@ SIMDATA argument is a name of YAML file with simdata config.`,
 			fmt.Println("INFRASTRUCTURE argument missing")
 			os.Exit(1)
 		}
-		sim := simulation.New(args[0])
+		sim := simulator.New(args[0])
 		sim.Run()
 	},
 }
 
 func init() {
-	RootCmd.AddCommand(simulationCmd)
+	RootCmd.AddCommand(simulatorCmd)
 
 	// Here you will define your flags and configuration settings.
 

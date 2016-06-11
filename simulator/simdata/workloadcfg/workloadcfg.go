@@ -8,7 +8,7 @@ import (
 
 	"gopkg.in/yaml.v2"
 
-	"github.com/ffloyd/evergrid-go/simulation/simdata/workloadcfg/datacfg"
+	"github.com/ffloyd/evergrid-go/simulator/simdata/workloadcfg/datacfg"
 )
 
 // YAML is a representation of workload yaml file

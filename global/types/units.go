@@ -10,4 +10,5 @@ type MBit int
 type MFlop int
 
 // UID - unique ID
+// TODO: eliminate!
 type UID string

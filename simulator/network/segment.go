@@ -2,7 +2,7 @@ package network
 
 import (
 	log "github.com/Sirupsen/logrus"
-	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
+	"github.com/ffloyd/evergrid-go/simulator/simdata/networkcfg"
 )
 
 // Segment represents a local connected scope of machines. As example - if they are part of same DigitalOcean region.

@@ -23,13 +23,13 @@ func NewAgentFSM(logContext *logrus.Entry) AgentFSM {
 
 func (fsm AgentFSM) logf(format string, args ...interface{}) {
 	if fsm.logContext != nil {
-		fsm.logContext.Infof(format, args...)
+		fsm.logContext.Debugf(format, args...)
 	}
 }
 
 func (fsm AgentFSM) logState() {
 	if fsm.logContext != nil {
-		fsm.logContext.WithField("state", fsm.state).Info("Agent state changed")
+		fsm.logContext.WithField("state", fsm.state).Debug("Agent state changed")
 	}
 }
 
@@ -116,6 +116,9 @@ func (fsm *AgentFSM) ToDoneChan() chan Ok {
 func (fsm *AgentFSM) SetStopFlag(value bool) {
 	if fsm.stopFlag != value {
 		fsm.stopFlag = value
+		if fsm.logContext != nil {
+			fsm.logContext.WithField("stopFlag", value).Debug("Agent changed stopFlag")
+		}
 		fsm.chans.stopFlagChan <- value
 	}
 }

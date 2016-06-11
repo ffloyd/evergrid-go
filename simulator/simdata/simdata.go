@@ -6,8 +6,8 @@ import (
 
 	log "github.com/Sirupsen/logrus"
 
-	"github.com/ffloyd/evergrid-go/simulation/simdata/networkcfg"
-	"github.com/ffloyd/evergrid-go/simulation/simdata/workloadcfg"
+	"github.com/ffloyd/evergrid-go/simulator/simdata/networkcfg"
+	"github.com/ffloyd/evergrid-go/simulator/simdata/workloadcfg"
 	"gopkg.in/yaml.v2"
 )
 
