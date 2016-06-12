@@ -102,7 +102,7 @@ func (state *genDataState) genData(config Config) {
 
 	for i := 0; i < config.CalculatorsCount; i++ {
 		data.Calculators[i] = datacfg.CalculatorCfgYAML{
-			Name:        fmt.Sprintf("Processor %d", i),
+			Name:        fmt.Sprintf("Calculator %d", i),
 			MFlopsPerMb: float64(uniformDistr(config.MinSpeed, config.MaxSpeed)),
 		}
 	}
@@ -145,7 +145,7 @@ func (state *genDataState) genWorkload(config Config) {
 		}
 
 		addRequest(tick, workloadcfg.RequestCfgYAML{
-			Type:       "run_expirement",
+			Type:       "run_experiment",
 			Calculator: state.dataYAML.Calculators[calculatorIndex].Name,
 			Dataset:    state.dataYAML.Datasets[datasetIndex].Name,
 		})

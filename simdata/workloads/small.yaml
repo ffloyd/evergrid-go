@@ -1,12 +1,24 @@
-name: Small workload
+name: small.yaml
 data: small.yaml
 requests:
-  1:
-    -
-      type: upload_dataset
-      dataset: Dataset 1
-  10:
-    -
-      type: run_expirement
-      dataset: Dataset 1
-      processor: Processor 1
+  3:
+  - type: upload_dataset
+    dataset: Dataset 4
+    calculator: ""
+  - type: run_experiment
+    dataset: Dataset 4
+    calculator: Calculator 3
+  4:
+  - type: upload_dataset
+    dataset: Dataset 1
+    calculator: ""
+  - type: run_experiment
+    dataset: Dataset 1
+    calculator: Calculator 0
+  6:
+  - type: upload_dataset
+    dataset: Dataset 0
+    calculator: ""
+  - type: run_experiment
+    dataset: Dataset 0
+    calculator: Calculator 1

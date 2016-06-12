@@ -51,7 +51,7 @@ func (fsm AgentFSM) StopFlag() bool {
 // ToReady -
 func (fsm *AgentFSM) ToReady() {
 	if fsm.state != StateDone {
-		panic("wrong state")
+		fsm.logContext.Panicf("Wrong state: %v", fsm.state)
 	}
 
 	fsm.chans.statusChan <- StateReady
@@ -67,7 +67,7 @@ func (fsm *AgentFSM) ToReady() {
 // ToIdle -
 func (fsm *AgentFSM) ToIdle() {
 	if fsm.state != StateReady && fsm.state != StateWorking {
-		panic("wrong state")
+		fsm.logContext.Panicf("Wrong state: %v", fsm.state)
 	}
 
 	fsm.chans.statusChan <- StateIdle
@@ -79,7 +79,7 @@ func (fsm *AgentFSM) ToIdle() {
 // ToWorking -
 func (fsm *AgentFSM) ToWorking() {
 	if fsm.state != StateReady && fsm.state != StateIdle {
-		panic("wrong state")
+		fsm.logContext.Panicf("Wrong state: %v", fsm.state)
 	}
 
 	fsm.chans.statusChan <- StateWorking
@@ -90,7 +90,7 @@ func (fsm *AgentFSM) ToWorking() {
 
 func (fsm *AgentFSM) toDone() {
 	if fsm.state != StateIdle {
-		panic("wrong state")
+		fsm.logContext.Panicf("Wrong state: %v", fsm.state)
 	}
 
 	fsm.chans.statusChan <- StateDone

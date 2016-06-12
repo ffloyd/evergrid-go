@@ -4,4 +4,5 @@ package types
 type CalculatorInfo struct {
 	UID         string
 	MFlopsPerMb MFlop
+	Workers     []string
 }

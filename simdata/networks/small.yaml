@@ -1,89 +1,86 @@
-name: Small network
+name: small.yaml
 segments:
-  -
-    name: Web Segment
-    inner_bandwith: [100, 100]
-    outer_bandwith: [50, 50]
-    nodes:
-      -
-        name: Web Node
-        agents:
-          -
-            name: Core
-            type: core
-  -
-    name: Segment A
-    inner_bandwith: [100, 100]
-    outer_bandwith: [50, 50]
-    nodes:
-      -
-        name: Control Node A
-        agents:
-          -
-            name: Control Unit A
-            type: control_unit
-      -
-        name: Worker A1 Node
-        agents:
-          -
-            name: Worker A1
-            type: worker
-            control_unit: Control Unit A
-            worker_disk: 100
-            worker_mflops: 100000
-      -
-        name: Worker A2 Node
-        agents:
-          -
-            name: Worker A2
-            type: worker
-            control_unit: Control Unit A
-            worker_disk: 100
-            worker_mflops: 100000
-      -
-        name: Worker A3 Node
-        agents:
-          -
-            name: Worker A3
-            type: worker
-            control_unit: Control Unit A
-            worker_disk: 100
-            worker_mflops: 100000
-  -
-    name: Segment B
-    inner_bandwith: [100, 100]
-    outer_bandwith: [50, 50]
-    nodes:
-      -
-        name: Control Node B
-        agents:
-          -
-            name: Control Unit B
-            type: control_unit
-      -
-        name: Worker B1 Node
-        agents:
-          -
-            name: Worker B1
-            type: worker
-            control_unit: Control Unit B
-            worker_disk: 100
-            worker_mflops: 100000
-      -
-        name: Worker B2 Node
-        agents:
-          -
-            name: Worker B2
-            type: worker
-            control_unit: Control Unit B
-            worker_disk: 100
-            worker_mflops: 100000
-      -
-        name: Worker B3 Node
-        agents:
-          -
-            name: Worker B3
-            type: worker
-            control_unit: Control Unit B
-            worker_disk: 100
-            worker_mflops: 100000
+- name: Segment 0
+  inner_bandwith: [100, 100]
+  outer_bandwith: [50, 50]
+  nodes:
+  - name: Node CU0
+    agents:
+    - name: ControlUnit CU0
+      type: control_unit
+  - name: Node X
+    agents:
+    - name: Core X
+      type: core
+  - name: Node 0-2
+    agents:
+    - name: Worker 0-2
+      type: worker
+      control_unit: ControlUnit CU0
+      worker_disk: 779
+      worker_mflops: 6086
+      price_per_tick: 0.35831162
+  - name: Node 0-3
+    agents:
+    - name: Worker 0-3
+      type: worker
+      control_unit: ControlUnit CU0
+      worker_disk: 1786
+      worker_mflops: 13315
+      price_per_tick: 1.011802
+- name: Segment 1
+  inner_bandwith: [100, 100]
+  outer_bandwith: [50, 50]
+  nodes:
+  - name: Node CU1
+    agents:
+    - name: ControlUnit CU1
+      type: control_unit
+  - name: Node 1-1
+    agents:
+    - name: Worker 1-1
+      type: worker
+      control_unit: ControlUnit CU1
+      worker_disk: 461
+      worker_mflops: 16357
+      price_per_tick: 0.1987442
+  - name: Node 1-2
+    agents:
+    - name: Worker 1-2
+      type: worker
+      control_unit: ControlUnit CU1
+      worker_disk: 1661
+      worker_mflops: 15818
+      price_per_tick: 0.108038336
+  - name: Node 1-3
+    agents:
+    - name: Worker 1-3
+      type: worker
+      control_unit: ControlUnit CU1
+      worker_disk: 1760
+      worker_mflops: 12168
+      price_per_tick: 0.81249493
+- name: Segment 2
+  inner_bandwith: [100, 100]
+  outer_bandwith: [50, 50]
+  nodes:
+  - name: Node CU2
+    agents:
+    - name: ControlUnit CU2
+      type: control_unit
+  - name: Node 2-1
+    agents:
+    - name: Worker 2-1
+      type: worker
+      control_unit: ControlUnit CU2
+      worker_disk: 379
+      worker_mflops: 15629
+      price_per_tick: 0.64244556
+  - name: Node 2-2
+    agents:
+    - name: Worker 2-2
+      type: worker
+      control_unit: ControlUnit CU2
+      worker_disk: 146
+      worker_mflops: 16857
+      price_per_tick: 0.62684023

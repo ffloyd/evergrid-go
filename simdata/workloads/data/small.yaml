@@ -1,9 +1,23 @@
-name: Small
+name: small.yaml
 datasets:
-    -
-        name: Dataset 1
-        size: 1
-processors:
-    -
-        name: Processor 1
-        mflops_per_mb: 512
+- name: Dataset 0
+  size: 2
+- name: Dataset 1
+  size: 8
+- name: Dataset 2
+  size: 8
+- name: Dataset 3
+  size: 20
+- name: Dataset 4
+  size: 2
+calculators:
+- name: Calculator 0
+  mflops_per_mb: 13382
+- name: Calculator 1
+  mflops_per_mb: 8595
+- name: Calculator 2
+  mflops_per_mb: 9868
+- name: Calculator 3
+  mflops_per_mb: 6888
+- name: Calculator 4
+  mflops_per_mb: 5402

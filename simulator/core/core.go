@@ -25,6 +25,9 @@ type Core struct {
 
 // New -
 func New(cfg networkcfg.AgentCfg, requests map[int][]*workloadcfg.RequestCfg, cuNames []string, logContext *logrus.Entry) *Core {
+	if cfg.Type != networkcfg.AgentCore {
+		logContext.Panic("Wrong agent type in config")
+	}
 	return &Core{
 		name: cfg.Name,
 		log:  logContext,
@@ -43,13 +46,13 @@ func (core *Core) Name() string {
 func (core *Core) Run(env *simenv.SimEnv) simenv.AgentChans {
 	core.currentTick = env.CurrentTick()
 
-	logContext := core.log.WithFields(logrus.Fields{
+	core.log = core.log.WithFields(logrus.Fields{
 		"agent": core.Name(),
 		"tick":  core.currentTick,
 	})
 
 	core.simenv = env
-	core.fsm = simenv.NewAgentFSM(logContext)
+	core.fsm = simenv.NewAgentFSM(core.log)
 
 	core.controlUnits = make([]simenv.Agent, len(core.controlUnitNames))
 	for i, cuName := range core.controlUnitNames {
@@ -77,9 +80,9 @@ func (core *Core) work() {
 
 		for _, request := range core.requests[tick] {
 			core.log.WithFields(logrus.Fields{
-				"control unit": controlUnit.Name(),
+				"control_unit": controlUnit.Name(),
 				"type":         request.Type,
-			}).Info("Core seding request to Control Unit")
+			}).Info("Core sending request to Control Unit")
 			<-controlUnit.Send(core.convertRequest(*request))
 		}
 
