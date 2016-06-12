@@ -1,7 +1,10 @@
 package random
 
 import (
+	"math/rand"
+
 	"github.com/Sirupsen/logrus"
+	"github.com/ffloyd/evergrid-go/global/types"
 	"github.com/ffloyd/evergrid-go/scheduler"
 )
 
@@ -55,11 +58,21 @@ func (s *Scheduler) work() {
 	for {
 		select {
 		case request := <-chans.UploadDataset:
-			s.log.Info(request)
-			chans.DelegateToLeader <- !s.leadershipStatus()
+			if s.leadershipStatus() {
+				s.processUploadDataset(request)
+				chans.DelegateToLeader <- false
+			} else {
+				chans.DelegateToLeader <- true
+			}
+
 		case request := <-chans.RunExperiment:
-			s.log.Info(request)
-			chans.DelegateToLeader <- !s.leadershipStatus()
+			if s.leadershipStatus() {
+				s.processRunExperiment(request)
+				chans.DelegateToLeader <- false
+			} else {
+				chans.DelegateToLeader <- true
+			}
+
 		}
 	}
 }
@@ -68,4 +81,59 @@ func (s *Scheduler) leadershipStatus() bool {
 	req := scheduler.NewGetLeadershipStatus()
 	s.infoChans.LeadershipStatus <- req
 	return <-req.Result
+}
+
+func (s *Scheduler) getRandomWorker() types.WorkerInfo {
+	getNames := scheduler.NewGetWorkerNames()
+	s.infoChans.WorkerNames <- getNames
+	names := <-getNames.Result
+
+	randomName := names[rand.Intn(len(names))]
+	getWorker := scheduler.NewGetWorkerInfo(randomName)
+	s.infoChans.WorkerInfo <- getWorker
+	return *<-getWorker.Result
+}
+
+func (s *Scheduler) getDatasetInfo(datasetName string) types.DatasetInfo {
+	getDataset := scheduler.NewGetDatasetInfo(datasetName)
+	s.infoChans.DatasetInfo <- getDataset
+	return *<-getDataset.Result
+}
+
+func (s *Scheduler) processUploadDataset(request scheduler.ReqUploadDataset) {
+	worker := s.getRandomWorker()
+	s.controlChans.UploadDataset <- scheduler.DoUploadDataset{
+		Worker:  worker.UID,
+		Dataset: request.Dataset.UID,
+	}
+	<-s.controlChans.Done
+
+	s.log.WithFields(logrus.Fields{
+		"dataset": request.Dataset.UID,
+		"worker":  worker.UID,
+	}).Info("Dataset uploading scheduled")
+}
+
+func (s *Scheduler) processRunExperiment(request scheduler.ReqRunExperiment) {
+	dataset := s.getDatasetInfo(request.Dataset.UID)
+	worker := append(dataset.Workers, dataset.EnqueuedOnWorkers...)[0]
+
+	s.controlChans.BuildCalculator <- scheduler.DoBuildCalculator{
+		Calculator: request.Calculator.UID,
+		Worker:     worker,
+	}
+	<-s.controlChans.Done
+
+	s.controlChans.RunCalculator <- scheduler.DoRunCalculator{
+		Calculator: request.Calculator.UID,
+		Dataset:    request.Dataset.UID,
+		Worker:     worker,
+	}
+	<-s.controlChans.Done
+
+	s.log.WithFields(logrus.Fields{
+		"dataset":    request.Dataset.UID,
+		"calculator": request.Calculator.UID,
+		"worker":     worker,
+	}).Info("Experiment run scheduled")
 }

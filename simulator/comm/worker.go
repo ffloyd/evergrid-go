@@ -20,3 +20,6 @@ type WorkerRunCalculator struct {
 
 // WorkerBusy -
 type WorkerBusy struct{}
+
+// WorkerInfo -
+type WorkerInfo struct{}

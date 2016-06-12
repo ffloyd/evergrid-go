@@ -14,6 +14,7 @@ type InfoChans struct {
 // NewInfoChans -
 func NewInfoChans() InfoChans {
 	return InfoChans{
+		WorkerNames:    make(chan GetWorkerNames),
 		WorkerInfo:     make(chan GetWorkerInfo),
 		DatasetInfo:    make(chan GetDatasetInfo),
 		CalculatorInfo: make(chan GetCalculatorInfo),

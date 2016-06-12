@@ -1,6 +1,7 @@
 package controlunit
 
 import (
+	"fmt"
 	"sync"
 
 	"github.com/Sirupsen/logrus"
@@ -28,7 +29,7 @@ type ControlUnit struct {
 	monitor    monitor
 
 	workerNames []string
-	workers     []simenv.Agent
+	workers     map[string]simenv.Agent
 	sendLock    sync.Mutex
 }
 
@@ -41,6 +42,7 @@ func New(cfg networkcfg.AgentCfg, workerNames []string, sharedData *SharedData, 
 		sharedData: sharedData,
 
 		workerNames: workerNames,
+		workers:     make(map[string]simenv.Agent),
 	}
 }
 
@@ -70,9 +72,8 @@ func (cu *ControlUnit) Run(env *simenv.SimEnv) simenv.AgentChans {
 		cu.log.Info("Become leader")
 	})
 
-	cu.workers = make([]simenv.Agent, len(cu.workerNames))
-	for i, workerName := range cu.workerNames {
-		cu.workers[i] = env.Find(workerName)
+	for _, workerName := range cu.workerNames {
+		cu.workers[workerName] = env.Find(workerName)
 	}
 
 	cu.monitor.Run()
@@ -83,13 +84,12 @@ func (cu *ControlUnit) Run(env *simenv.SimEnv) simenv.AgentChans {
 
 // Send - respond means that request arrived to proper scheduler
 func (cu *ControlUnit) Send(msg interface{}) chan interface{} {
-	cu.sendLock.Lock()
-	cu.fsm.ToWorking()
-
 	schedChans := cu.scheduler.RequestChans()
 
 	switch request := msg.(type) {
 	case comm.ControlUnitUploadDataset:
+		cu.sendLock.Lock()
+		cu.fsm.ToWorking()
 		schedChans.UploadDataset <- scheduler.ReqUploadDataset{
 			Dataset: request.Dataset,
 		}
@@ -97,7 +97,11 @@ func (cu *ControlUnit) Send(msg interface{}) chan interface{} {
 		if <-schedChans.DelegateToLeader {
 			<-cu.sharedData.LeaderControlUnit.Send(request)
 		}
+		cu.fsm.ToIdle()
+		cu.sendLock.Unlock()
 	case comm.ControlUnitRunExperiment:
+		cu.sendLock.Lock()
+		cu.fsm.ToWorking()
 		schedChans.RunExperiment <- scheduler.ReqRunExperiment{
 			Calculator: request.Calculator,
 			Dataset:    request.Dataset,
@@ -106,31 +110,33 @@ func (cu *ControlUnit) Send(msg interface{}) chan interface{} {
 		if <-schedChans.DelegateToLeader {
 			<-cu.sharedData.LeaderControlUnit.Send(request)
 		}
+		cu.fsm.ToIdle()
+		cu.sendLock.Unlock()
 	case scheduler.DoUploadDataset:
-		cu.processUploadDataset(request)
+		cu.processWorkerAction(request)
 	case scheduler.DoBuildCalculator:
-		cu.processBuildCalculator(request)
+		cu.processWorkerAction(request)
 	case scheduler.DoRunCalculator:
-		cu.processRunCalculator(request)
+		cu.processWorkerAction(request)
 	default:
 		cu.log.Panicf("Unknown request type: %v", request)
 	}
 
-	cu.fsm.ToIdle()
 	response := make(chan interface{})
 	go func() {
 		response <- simenv.Ok{}
 	}()
-	cu.sendLock.Unlock()
 	return response
 }
 
 func (cu *ControlUnit) work() {
 	cu.fsm.SetStopFlag(true)
 	chans := cu.scheduler.ControlChans()
-	cu.sendLock.Lock()
 	for {
+		cu.sendLock.Lock()
 		cu.fsm.ToReady()
+		cu.fsm.ToWorking()
+		cu.localQueue.Process()
 		cu.fsm.ToIdle()
 		cu.sendLock.Unlock()
 
@@ -140,31 +146,48 @@ func (cu *ControlUnit) work() {
 		for {
 			select {
 			case request := <-chans.UploadDataset:
-				cu.processUploadDataset(request)
+				cu.processWorkerAction(request)
+				chans.Done <- scheduler.Done{}
 			case request := <-chans.BuildCalculator:
-				cu.processBuildCalculator(request)
+				cu.processWorkerAction(request)
+				chans.Done <- scheduler.Done{}
 			case request := <-chans.RunCalculator:
-				cu.processRunCalculator(request)
+				cu.processWorkerAction(request)
+				chans.Done <- scheduler.Done{}
 			case <-doneChan:
-				cu.sendLock.Lock()
 				break SelectLoop
 			}
 		}
 	}
 }
 
-func (cu *ControlUnit) processUploadDataset(request scheduler.DoUploadDataset) {
-	cu.log.Info(request)
-}
+func (cu *ControlUnit) processWorkerAction(request interface{}) {
+	var workerName string
+	var actionType string
+	switch value := request.(type) {
+	case scheduler.DoUploadDataset:
+		workerName = value.Worker
+		actionType = fmt.Sprintf("%T", value)
+	case scheduler.DoRunCalculator:
+		workerName = value.Worker
+		actionType = fmt.Sprintf("%T", value)
+	case scheduler.DoBuildCalculator:
+		workerName = value.Worker
+		actionType = fmt.Sprintf("%T", value)
+	}
 
-func (cu *ControlUnit) processBuildCalculator(request scheduler.DoBuildCalculator) {
-	cu.log.Info(request)
-}
+	cu.log.WithFields(logrus.Fields{
+		"worker":      workerName,
+		"action_type": actionType,
+	}).Info("Process worker action")
 
-func (cu *ControlUnit) processRunCalculator(request scheduler.DoRunCalculator) {
-	cu.log.Info(request)
-}
-
-func (cu *ControlUnit) amILeader() bool {
-	return cu.Name() == cu.sharedData.LeaderControlUnit.Name()
+	if cu.workers[workerName] != nil {
+		cu.localQueue.Push(request)
+	} else {
+		cu.sharedData.Mutex.Lock()
+		correctCUName := cu.sharedData.Workers[workerName].ControlUnit
+		cu.sharedData.Mutex.Unlock()
+		cu.log.Info(correctCUName)
+		<-cu.simenv.Find(correctCUName).Send(request)
+	}
 }

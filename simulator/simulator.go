@@ -39,6 +39,14 @@ func New(simdataFilename string) *Simulator {
 	sim.network = network.New(sim.simData.Network)
 	sim.sharedData = controlunit.NewSharedData()
 
+	// fill shared data
+	for name, calcCfg := range sim.simData.Workload.Data.Calculators {
+		sim.sharedData.Calculators[name] = calcCfg.Info()
+	}
+	for name, datasetCfg := range sim.simData.Workload.Data.Datasets {
+		sim.sharedData.Datasets[name] = datasetCfg.Info()
+	}
+
 	for _, agentCfg := range sim.simData.Network.Agents {
 		switch agentCfg.Type {
 		case networkcfg.AgentControlUnit:

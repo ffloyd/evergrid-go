@@ -104,6 +104,8 @@ func (worker *Worker) Send(msg interface{}) chan interface{} {
 		worker.executor.Prepare(request)
 	case comm.WorkerBusy:
 		responseMsg = worker.busy
+	case comm.WorkerInfo:
+		responseMsg = worker.getInfo()
 	default:
 		worker.log.Panicf("Unknown request type: %v", request)
 	}
@@ -138,5 +140,17 @@ func (worker *Worker) work() {
 func (worker *Worker) busyCheck() {
 	if worker.busy {
 		worker.log.Panic("Incorrect request to busy worker")
+	}
+}
+
+func (worker *Worker) getInfo() types.WorkerInfo {
+	return types.WorkerInfo{
+		UID:            worker.Name(),
+		Busy:           worker.busy,
+		MFlops:         worker.performance,
+		TotalDiskSpace: worker.totalSpace,
+		FreeDiskSpace:  worker.freeSpace,
+		PricePerTick:   worker.pricePerTick,
+		ControlUnit:    worker.controlUnitName,
 	}
 }
