@@ -27,20 +27,20 @@ DISTDIR argument is a name of directory for generated dimdata. NAME - id a name 
 			Name:    args[0],
 			DestDir: args[1],
 
-			DatsetsCount:   5,
+			DatsetsCount:   20,
 			MinDatasetSize: 1,
 			MaxDatasetSize: 20,
 
-			CalculatorsCount: 5,
+			CalculatorsCount: 20,
 			MinSpeed:         2000,
 			MaxSpeed:         20000,
 
-			CalculatorRuns: 3,
-			RunProbability: 0.5,
+			CalculatorRuns: 100,
+			RunProbability: 0.1,
 
-			NetworkSegments:   3,
-			MinNodesInSegment: 2,
-			MaxNodesInSegment: 3,
+			NetworkSegments:   10,
+			MinNodesInSegment: 5,
+			MaxNodesInSegment: 10,
 			MinNodeSpeed:      5000,
 			MaxNodeSpeed:      20000,
 			MinPricePerTick:   1.0 / 60.0,

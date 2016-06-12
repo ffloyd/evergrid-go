@@ -1,7 +1,6 @@
 package controlunit
 
 import (
-	"fmt"
 	"sync"
 
 	"github.com/Sirupsen/logrus"
@@ -155,6 +154,7 @@ func (cu *ControlUnit) work() {
 				cu.processWorkerAction(request)
 				chans.Done <- scheduler.Done{}
 			case <-doneChan:
+				cu.fsm.SetStopFlag(cu.localQueue.Empty())
 				break SelectLoop
 			}
 		}
@@ -163,23 +163,14 @@ func (cu *ControlUnit) work() {
 
 func (cu *ControlUnit) processWorkerAction(request interface{}) {
 	var workerName string
-	var actionType string
 	switch value := request.(type) {
 	case scheduler.DoUploadDataset:
 		workerName = value.Worker
-		actionType = fmt.Sprintf("%T", value)
 	case scheduler.DoRunCalculator:
 		workerName = value.Worker
-		actionType = fmt.Sprintf("%T", value)
 	case scheduler.DoBuildCalculator:
 		workerName = value.Worker
-		actionType = fmt.Sprintf("%T", value)
 	}
-
-	cu.log.WithFields(logrus.Fields{
-		"worker":      workerName,
-		"action_type": actionType,
-	}).Info("Process worker action")
 
 	if cu.workers[workerName] != nil {
 		cu.localQueue.Push(request)

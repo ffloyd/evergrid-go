@@ -44,7 +44,7 @@ func (lq *localQueue) Push(task interface{}) {
 		worker := sd.Workers[workerName]
 		calculator.EnqueuedOnWorkers = append(calculator.EnqueuedOnWorkers, workerName)
 		worker.QueueLength++
-		worker.CalculatorsInQueue = append(worker.DatasetsInQueue, calculator.UID)
+		worker.CalculatorsInQueue = append(worker.CalculatorsInQueue, calculator.UID)
 
 		lq.cu.log.WithFields(logrus.Fields{
 			"worker":     workerName,
@@ -124,6 +124,14 @@ func (lq *localQueue) Process() {
 			})
 		}
 	}
+}
+
+func (lq *localQueue) Empty() bool {
+	sum := 0
+	for _, arr := range lq.queues {
+		sum += len(arr)
+	}
+	return sum == 0
 }
 
 func (lq *localQueue) updateWorkersInfo() {
