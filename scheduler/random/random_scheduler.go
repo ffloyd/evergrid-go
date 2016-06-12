@@ -56,10 +56,16 @@ func (s *Scheduler) work() {
 		select {
 		case request := <-chans.UploadDataset:
 			s.log.Info(request)
-			chans.DelegateToLeader <- false
+			chans.DelegateToLeader <- !s.leadershipStatus()
 		case request := <-chans.RunExperiment:
 			s.log.Info(request)
-			chans.DelegateToLeader <- false
+			chans.DelegateToLeader <- !s.leadershipStatus()
 		}
 	}
+}
+
+func (s *Scheduler) leadershipStatus() bool {
+	req := scheduler.NewGetLeadershipStatus()
+	s.infoChans.LeadershipStatus <- req
+	return <-req.Result
 }
