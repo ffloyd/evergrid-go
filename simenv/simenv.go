@@ -1,5 +1,7 @@
 package simenv
 
+import "sync"
+
 /*
 SimEnv -
 */
@@ -54,7 +56,7 @@ func (simenv *SimEnv) Run() error {
 
 // CurrentTick -
 func (simenv *SimEnv) CurrentTick() *CurrentTick {
-	ct := &CurrentTick{simenv.tick}
+	ct := &CurrentTick{simenv.tick, new(sync.Mutex)}
 	channel := make(chan int)
 
 	simenv.tickBroadcast = append(simenv.tickBroadcast, channel)

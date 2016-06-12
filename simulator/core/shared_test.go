@@ -35,7 +35,7 @@ func (ra *ReceiverAgent) Run(env *simenv.SimEnv) simenv.AgentChans {
 	})
 
 	ra.simenv = env
-	ra.fsm = simenv.NewAgentFSM(ra.log)
+	ra.fsm = *simenv.NewAgentFSM(ra.log)
 
 	go ra.work()
 	return ra.fsm.Chans()

@@ -52,7 +52,7 @@ func (core *Core) Run(env *simenv.SimEnv) simenv.AgentChans {
 	})
 
 	core.simenv = env
-	core.fsm = simenv.NewAgentFSM(core.log)
+	core.fsm = *simenv.NewAgentFSM(core.log)
 
 	core.controlUnits = make([]simenv.Agent, len(core.controlUnitNames))
 	for i, cuName := range core.controlUnitNames {

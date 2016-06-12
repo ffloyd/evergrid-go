@@ -15,13 +15,13 @@ func NewSimpleAgent(name string) *SimpleAgent {
 	}
 }
 
-func (agent SimpleAgent) Name() string {
+func (agent *SimpleAgent) Name() string {
 	return agent.name
 }
 
 func (agent *SimpleAgent) Run(simenv *SimEnv) AgentChans {
 	agent.simenv = simenv
-	agent.fsm = NewAgentFSM(nil)
+	agent.fsm = *NewAgentFSM(nil)
 	go agent.work()
 	return agent.fsm.Chans()
 }

@@ -1,6 +1,9 @@
 package simenv
 
-import "strconv"
+import (
+	"strconv"
+	"sync"
+)
 
 /*
 CurrentTick представляет из себя число, которое синхронизируется с SimEnv и
@@ -14,7 +17,8 @@ CurrentTick представляет из себя число, которое с
 cоответсвующий метод SimEnv'а.
 */
 type CurrentTick struct {
-	tick int
+	tick  int
+	mutex *sync.Mutex
 }
 
 func (ct *CurrentTick) connect(ch chan int) {
@@ -23,7 +27,9 @@ func (ct *CurrentTick) connect(ch chan int) {
 		if nextVal == -1 {
 			break
 		}
+		ct.mutex.Lock()
 		ct.tick = nextVal
+		ct.mutex.Unlock()
 	}
 }
 
@@ -32,6 +38,8 @@ func (ct CurrentTick) String() string {
 }
 
 // Int -
-func (ct CurrentTick) Int() int {
+func (ct *CurrentTick) Int() int {
+	ct.mutex.Lock()
+	defer ct.mutex.Unlock()
 	return ct.tick
 }

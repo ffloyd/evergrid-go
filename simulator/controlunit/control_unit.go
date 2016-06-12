@@ -58,7 +58,7 @@ func (cu *ControlUnit) Run(env *simenv.SimEnv) simenv.AgentChans {
 	})
 
 	cu.simenv = env
-	cu.fsm = simenv.NewAgentFSM(cu.log)
+	cu.fsm = *simenv.NewAgentFSM(cu.log)
 
 	cu.scheduler = cu.schedGen(cu.log.WithField("context", "scheduler"))
 

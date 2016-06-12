@@ -1,19 +1,25 @@
 package simenv
 
-import "github.com/Sirupsen/logrus"
+import (
+	"sync"
+
+	"github.com/Sirupsen/logrus"
+)
 
 // AgentFSM -
 type AgentFSM struct {
-	chans    AgentChans
-	state    AgentState
-	stopFlag bool
+	chans AgentChans
+	state AgentState
+
+	stopFlag      bool
+	stopFlagMutex sync.Mutex
 
 	logContext *logrus.Entry
 }
 
 // NewAgentFSM -
-func NewAgentFSM(logContext *logrus.Entry) AgentFSM {
-	return AgentFSM{
+func NewAgentFSM(logContext *logrus.Entry) *AgentFSM {
+	return &AgentFSM{
 		chans:      NewAgentChans(),
 		state:      StateDone,
 		stopFlag:   false,
@@ -21,30 +27,32 @@ func NewAgentFSM(logContext *logrus.Entry) AgentFSM {
 	}
 }
 
-func (fsm AgentFSM) logf(format string, args ...interface{}) {
+func (fsm *AgentFSM) logf(format string, args ...interface{}) {
 	if fsm.logContext != nil {
 		fsm.logContext.Debugf(format, args...)
 	}
 }
 
-func (fsm AgentFSM) logState() {
+func (fsm *AgentFSM) logState() {
 	if fsm.logContext != nil {
 		fsm.logContext.WithField("state", fsm.state).Debug("Agent state changed")
 	}
 }
 
 // Chans -
-func (fsm AgentFSM) Chans() AgentChans {
+func (fsm *AgentFSM) Chans() AgentChans {
 	return fsm.chans
 }
 
 // State -
-func (fsm AgentFSM) State() AgentState {
+func (fsm *AgentFSM) State() AgentState {
 	return fsm.state
 }
 
 // StopFlag -
-func (fsm AgentFSM) StopFlag() bool {
+func (fsm *AgentFSM) StopFlag() bool {
+	fsm.stopFlagMutex.Lock()
+	defer fsm.stopFlagMutex.Unlock()
 	return fsm.stopFlag
 }
 
@@ -114,6 +122,7 @@ func (fsm *AgentFSM) ToDoneChan() chan Ok {
 
 // SetStopFlag -
 func (fsm *AgentFSM) SetStopFlag(value bool) {
+	fsm.stopFlagMutex.Lock()
 	if fsm.stopFlag != value {
 		fsm.stopFlag = value
 		if fsm.logContext != nil {
@@ -121,4 +130,5 @@ func (fsm *AgentFSM) SetStopFlag(value bool) {
 		}
 		fsm.chans.stopFlagChan <- value
 	}
+	fsm.stopFlagMutex.Unlock()
 }

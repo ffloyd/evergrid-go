@@ -32,7 +32,7 @@ func (sa *SenderAgent) Name() string {
 
 func (sa *SenderAgent) Run(env *simenv.SimEnv) simenv.AgentChans {
 	sa.simenv = env
-	sa.fsm = simenv.NewAgentFSM(sa.log.WithFields(logrus.Fields{
+	sa.fsm = *simenv.NewAgentFSM(sa.log.WithFields(logrus.Fields{
 		"agent": sa.Name(),
 		"tick":  env.CurrentTick(),
 	}))

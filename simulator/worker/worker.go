@@ -73,7 +73,7 @@ func (worker *Worker) Run(env *simenv.SimEnv) simenv.AgentChans {
 
 	worker.simenv = env
 	worker.controlUnit = env.Find(worker.controlUnitName)
-	worker.fsm = simenv.NewAgentFSM(worker.log)
+	worker.fsm = *simenv.NewAgentFSM(worker.log)
 
 	worker.uploader = newUploader(worker, worker.log)
 	worker.builder = newBuilder(worker, worker.log)
