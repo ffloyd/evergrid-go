@@ -30,9 +30,9 @@ DISTDIR argument is a name of directory for generated dimdata. NAME - id a name 
 			MinDatasetSize: 1,
 			MaxDatasetSize: 20,
 
-			CalculatorsCount: 20,
-			MinSpeed:         2000,
-			MaxSpeed:         20000,
+			CalculatorsCount:        20,
+			MinCalculatorComplexity: 2000,
+			MaxCalculatorComplexity: 20000,
 
 			CalculatorRuns: 100,
 			RunProbability: 0.1,

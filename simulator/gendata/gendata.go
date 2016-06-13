@@ -36,7 +36,7 @@ type genDataState struct {
 	simdataYAML  simdata.YAML
 }
 
-// GenData generates simdata files using given config
+// GenData - это генератор сценрия работы на основе заданной конфигурации
 func GenData(config Config) {
 	state := genDataState{}
 	state.prepareDirs(config)
@@ -83,8 +83,8 @@ func (state *genDataState) genData(config Config) {
 		"datasets":            config.DatsetsCount,
 		"min_dataset_size":    config.MinDatasetSize,
 		"max_dataset_size":    config.MaxDatasetSize,
-		"min_processor_speed": config.MinSpeed,
-		"max_processor_speed": config.MaxSpeed,
+		"min_processor_speed": config.MinCalculatorComplexity,
+		"max_processor_speed": config.MaxCalculatorComplexity,
 	}).Info("Generating data...")
 
 	data := &state.dataYAML
@@ -103,7 +103,7 @@ func (state *genDataState) genData(config Config) {
 	for i := 0; i < config.CalculatorsCount; i++ {
 		data.Calculators[i] = datacfg.CalculatorCfgYAML{
 			Name:        fmt.Sprintf("Calculator %d", i),
-			MFlopsPerMb: float64(uniformDistr(config.MinSpeed, config.MaxSpeed)),
+			MFlopsPerMb: float64(uniformDistr(config.MinCalculatorComplexity, config.MaxCalculatorComplexity)),
 		}
 	}
 
