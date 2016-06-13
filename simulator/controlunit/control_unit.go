@@ -12,7 +12,10 @@ import (
 
 type schedulerGenerator func(logContext *logrus.Entry) scheduler.Scheduler
 
-// ControlUnit -
+/*
+ControlUnit - реализация компонента Control Unit. Отвечает за обработку запросов от Core и
+делегированных от других Control Unit'ов запросов.
+*/
 type ControlUnit struct {
 	name   string
 	fsm    simenv.AgentFSM
@@ -32,7 +35,13 @@ type ControlUnit struct {
 	sendLock    sync.Mutex
 }
 
-// New -
+/*
+New создает новый ControlUnit.
+
+Для создания нового ControlUnit'а необходима его конфигурация, список имен подконтрольных воркеров,
+функция, которая будет возвращать используемую реализацию scheduler'а и контекст, в котором будут писаться
+логи.
+*/
 func New(cfg networkcfg.AgentCfg, workerNames []string, sharedData *SharedData, schedGen schedulerGenerator, logContext *logrus.Entry) *ControlUnit {
 	return &ControlUnit{
 		name:       cfg.Name,
@@ -45,12 +54,12 @@ func New(cfg networkcfg.AgentCfg, workerNames []string, sharedData *SharedData, 
 	}
 }
 
-// Name -
+// Name - возращает имя агента. Необходима для реализации интерфейса simenv.Agent.
 func (cu *ControlUnit) Name() string {
 	return cu.name
 }
 
-// Run -
+// Run запускает ControlUnit и все его подкомпоненты.
 func (cu *ControlUnit) Run(env *simenv.SimEnv) simenv.AgentChans {
 	cu.log = cu.log.WithFields(logrus.Fields{
 		"agent": cu.Name(),
@@ -81,7 +90,29 @@ func (cu *ControlUnit) Run(env *simenv.SimEnv) simenv.AgentChans {
 	return cu.fsm.Chans()
 }
 
-// Send - respond means that request arrived to proper scheduler
+/*
+Send отвечает за обработку запросов ControlUnit'ом.
+
+В данной реализацие ответом на все запросы является simenv.Ok{}. Ответ высылается в
+тот момент, когда вся работа связанная с поступившим запросом выполнена. Так как эта
+работа может включать в себя запросы к другим ControlUnit'ам то в данной реализации
+нельзя допускать параллельной обработки запросов приходящих от Core - иначе возможно
+состояние гонки, которое приведет к нарушению согласованности данных.
+
+Решением этой проблемы может стать написание подсистемы, определяющей зависимости между
+запросами и определяющей статусы выполнения асинхронных запросов среди ControlUnit'ов. Это
+позволит сохранить последовательный сценарий работы там, где это критично и параллельно
+обрабатывать независимые цепочки запросов.
+
+ControlUnit может получать три два вида запросов, которые отличаются моделью выполнения:
+
+comm.ControlUnitUploadDataset и comm.ControlUnitRunExperiment - это запросы, по сути,
+к планировщику. В один момент времени может выполняться только один такой запрос.
+
+scheduler.DoUploadDataset, scheduler.DoBuildCalculator, scheduler.DoRunCalculator - это
+запросы на добавление задачи в очередь Worker'а. Такие запросы могут обрабатываться параллельно,
+но внутри, естественно, возможны невзаимные блокировки при непосредственном изменении очередей.
+*/
 func (cu *ControlUnit) Send(msg interface{}) chan interface{} {
 	schedChans := cu.scheduler.RequestChans()
 

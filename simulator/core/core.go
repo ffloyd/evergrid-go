@@ -1,3 +1,4 @@
+// Package core содержит реализацию модели компонента Core
 package core
 
 import (
@@ -10,7 +11,11 @@ import (
 	"github.com/ffloyd/evergrid-go/simulator/simdata/workloadcfg"
 )
 
-// Core -
+/*
+Core - реализация модели одноименного компонента.
+
+Не принимает никаких запросов, а только шлет запросы Control Unit'ам по предопределенному сценарию.
+*/
 type Core struct {
 	name   string
 	fsm    simenv.AgentFSM
@@ -23,7 +28,11 @@ type Core struct {
 	currentTick      *simenv.CurrentTick
 }
 
-// New -
+/*
+New создает новый Core
+
+Для создания нового Core необходима его конфигурация, сценарий запросов, имена ControlUnit'ов и контекст для записи логов.
+*/
 func New(cfg networkcfg.AgentCfg, requests map[int][]*workloadcfg.RequestCfg, cuNames []string, logContext *logrus.Entry) *Core {
 	if cfg.Type != networkcfg.AgentCore {
 		logContext.Panic("Wrong agent type in config")
@@ -37,12 +46,17 @@ func New(cfg networkcfg.AgentCfg, requests map[int][]*workloadcfg.RequestCfg, cu
 	}
 }
 
-// Name -
+// Name - возвращает имя агента.
 func (core *Core) Name() string {
 	return core.name
 }
 
-// Run -
+/*
+Run запускает работу Core.
+
+Посылку запросов Core совершает последовательно: новый запрос не посылается до тех пор,
+пока не обработан предыдущий.
+*/
 func (core *Core) Run(env *simenv.SimEnv) simenv.AgentChans {
 	core.currentTick = env.CurrentTick()
 
@@ -63,7 +77,9 @@ func (core *Core) Run(env *simenv.SimEnv) simenv.AgentChans {
 	return core.fsm.Chans()
 }
 
-// Send -
+// Send в случае с Core попытка использования этого метода приведет к ошибке так как
+// в рамках текущей модели не моделируется обратная связь и отправка результатов выполнения
+// задач обратно в Core.
 func (core *Core) Send(msg interface{}) chan interface{} {
 	core.log.Panic("Core cannot receive requests")
 	return nil
