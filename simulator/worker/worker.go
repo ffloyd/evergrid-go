@@ -10,7 +10,11 @@ import (
 	"github.com/ffloyd/evergrid-go/simulator/simdata/networkcfg"
 )
 
-// Worker -
+/*
+Worker - это реализация компонента Worker.
+
+Worker может получать запросы только от ControlUnit'а и сам не шлет запросов другим агентам.
+*/
 type Worker struct {
 	name   string
 	fsm    simenv.AgentFSM
@@ -35,7 +39,7 @@ type Worker struct {
 	stats Stats
 }
 
-// New -
+// New - для создания воркера требуется его конфигурация и котекст логгера.
 func New(cfg networkcfg.AgentCfg, logContext *logrus.Entry) *Worker {
 	if cfg.Type != networkcfg.AgentWorker {
 		logContext.Panic("Wrong agent type in config")
@@ -54,17 +58,17 @@ func New(cfg networkcfg.AgentCfg, logContext *logrus.Entry) *Worker {
 	}
 }
 
-// Name -
+// Name возвращает имя агента.
 func (worker *Worker) Name() string {
 	return worker.name
 }
 
-// Stats -
+// Stats возвращает текущую статистику использования воркера.
 func (worker *Worker) Stats() Stats {
 	return worker.stats
 }
 
-// Run -
+// Run запускает воркер и все его подкомпоненты.
 func (worker *Worker) Run(env *simenv.SimEnv) simenv.AgentChans {
 	worker.log = worker.log.WithFields(logrus.Fields{
 		"agent": worker.Name(),
@@ -84,7 +88,12 @@ func (worker *Worker) Run(env *simenv.SimEnv) simenv.AgentChans {
 	return worker.fsm.Chans()
 }
 
-// Send -
+/*
+Send принимает запросы присланные воркеру.
+
+В один момент времени воркер может выполнять только одну задачу. При попытке
+нарушить это правило произойдет panic. Обработка входящих запросов к воркеру - синхронна.
+*/
 func (worker *Worker) Send(msg interface{}) chan interface{} {
 	worker.sendLock.Lock()
 	worker.fsm.ToWorking()
