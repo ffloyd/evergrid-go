@@ -1,22 +1,23 @@
 package simenv
 
-// Ok -
+/*
+Ok - воспомагательная "косметическая" структура
+
+При реализации метода Send интерфейса Agent могут быть случаи, когда в качестве ответа
+надо лишь подтвердить получение или успешную обработку запроса. В таком случае можно писать:
+
+	responseChan <- Ok{}
+*/
 type Ok struct{}
 
-// AgentState - represent statuses for Syncable
+// AgentState - это тип для состояний агентов
 type AgentState int
 
+// Набор констант для описания состояний агентов
 const (
-	// StateReady - means that new tick received
 	StateReady AgentState = iota
-
-	// StateWorking - means that current entity doing some work now
 	StateWorking
-
-	// StateIdle - means that current entity active and waits for interactions from other entities
 	StateIdle
-
-	// StateDone - means that current entity finished all possible work for current tick
 	StateDone
 )
 

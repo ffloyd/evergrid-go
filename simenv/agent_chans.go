@@ -1,7 +1,9 @@
 package simenv
 
 /*
-AgentChans -
+AgentChans это каналы, по которым агент общается с ядром.
+
+Не должны создаваться или использоваться напрямую - интерфейс работы с ними реализован в AgentFSM
 */
 type AgentChans struct {
 	statusChan     chan AgentState
@@ -11,7 +13,7 @@ type AgentChans struct {
 }
 
 // NewAgentChans -
-func NewAgentChans() AgentChans {
+func newAgentChans() AgentChans {
 	return AgentChans{
 		statusChan:     make(chan AgentState),
 		startWorkChan:  make(chan Ok),

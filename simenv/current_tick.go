@@ -37,7 +37,7 @@ func (ct CurrentTick) String() string {
 	return strconv.Itoa(ct.tick)
 }
 
-// Int -
+// Int возвращает номер текущего тика
 func (ct *CurrentTick) Int() int {
 	ct.mutex.Lock()
 	defer ct.mutex.Unlock()

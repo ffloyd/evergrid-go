@@ -3,7 +3,11 @@ package simenv
 import "sync"
 
 /*
-SimEnv -
+SimEnv - это ядро симуляции.
+
+Именно через эту структуру происходит синхронзация работы всех агентов.
+
+Симуляция разбита на дискретные "тики" в рамках которой агенты меняют свои состояния.
 */
 type SimEnv struct {
 	tick          int
@@ -12,26 +16,26 @@ type SimEnv struct {
 	inProgress    bool
 }
 
-// New -
+// New - инициализатор
 func New() *SimEnv {
 	return &SimEnv{
 		agents: make(map[string]Agent),
 	}
 }
 
-// Add -
+// Add добавляет агентов в симуляцию
 func (simenv *SimEnv) Add(agents ...Agent) {
 	for _, agent := range agents {
 		simenv.agents[agent.Name()] = agent
 	}
 }
 
-// Find -
+// Find ищет агента по имени
 func (simenv SimEnv) Find(agentName string) Agent {
 	return simenv.agents[agentName]
 }
 
-// Run -
+// Run запускает всех агентов и симуляцию
 func (simenv *SimEnv) Run() error {
 	group := runAgentGroup(simenv)
 
@@ -54,7 +58,7 @@ func (simenv *SimEnv) Run() error {
 	return nil
 }
 
-// CurrentTick -
+// CurrentTick возвращает структуру, которая всегда содержит текущий тик симуляции
 func (simenv *SimEnv) CurrentTick() *CurrentTick {
 	ct := &CurrentTick{simenv.tick, new(sync.Mutex)}
 	channel := make(chan int)

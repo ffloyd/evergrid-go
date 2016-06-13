@@ -6,7 +6,30 @@ import (
 	"github.com/Sirupsen/logrus"
 )
 
-// AgentFSM -
+/*
+AgentFSM (Agent's finite state machine)- это структура контроллирующая состояние агента.
+
+Тривиальный жизненный цикл агента выглядит следующим образом:
+
+	// инициализация агента
+
+	for {
+		// действия необходимые перед началом тика
+		fsm.ToReady()
+		fsm.ToWorking()
+		// полезная нагрузка, общение с другими агентами
+		fsm.ToIdle()
+		if noMoreWorkInFuture {
+			fsm.SetStopFlag(true)
+		}
+		<-fsm.ToDoneChan()
+
+	}
+
+Текущий статус агента определяется его состоянием (Done, Ready, Working, Idle) и значением флага stopFlag.
+
+Тик завершается, когда все агенты находятся в состоянии Idle. Симуляция завершается, когда у всех агентов stopFlag равен true.
+*/
 type AgentFSM struct {
 	chans AgentChans
 	state AgentState
@@ -17,10 +40,14 @@ type AgentFSM struct {
 	logContext *logrus.Entry
 }
 
-// NewAgentFSM -
+/*
+NewAgentFSM - инициализатор AgentFSM
+
+logContext - это контекст для логов. На уровне debug логируется смена статусов.
+*/
 func NewAgentFSM(logContext *logrus.Entry) *AgentFSM {
 	return &AgentFSM{
-		chans:      NewAgentChans(),
+		chans:      newAgentChans(),
 		state:      StateDone,
 		stopFlag:   false,
 		logContext: logContext,
@@ -39,24 +66,28 @@ func (fsm *AgentFSM) logState() {
 	}
 }
 
-// Chans -
+// Chans возвращает каналы для общения с агентом. Это нужно для реализации метода Run интерфейса Agent.
 func (fsm *AgentFSM) Chans() AgentChans {
 	return fsm.chans
 }
 
-// State -
+// State возвращает текущее состояние агента.
 func (fsm *AgentFSM) State() AgentState {
 	return fsm.state
 }
 
-// StopFlag -
+// StopFlag возвращает текущее значение флага stopFlag
 func (fsm *AgentFSM) StopFlag() bool {
 	fsm.stopFlagMutex.Lock()
 	defer fsm.stopFlagMutex.Unlock()
 	return fsm.stopFlag
 }
 
-// ToReady -
+/*
+ToReady переводит агент в состояние Ready и ожидает, когда остальные агенты дотигнут этого состояния.
+
+Переход в состояние Ready возможен только из состояния Done.
+*/
 func (fsm *AgentFSM) ToReady() {
 	if fsm.state != StateDone {
 		fsm.logContext.Panicf("Wrong state: %v", fsm.state)
@@ -72,7 +103,11 @@ func (fsm *AgentFSM) ToReady() {
 	fsm.logf("Agent allowed to work")
 }
 
-// ToIdle -
+/*
+ToIdle переводит агент в состояние Idle.
+
+Переход возможен только из состояний Ready и Working.
+*/
 func (fsm *AgentFSM) ToIdle() {
 	if fsm.state != StateReady && fsm.state != StateWorking {
 		fsm.logContext.Panicf("Wrong state: %v", fsm.state)
@@ -84,7 +119,11 @@ func (fsm *AgentFSM) ToIdle() {
 	fsm.logState()
 }
 
-// ToWorking -
+/*
+ToWorking переводит агент в состояние Working.
+
+Переход возможен только из состояний Ready и Idle
+*/
 func (fsm *AgentFSM) ToWorking() {
 	if fsm.state != StateReady && fsm.state != StateIdle {
 		fsm.logContext.Panicf("Wrong state: %v", fsm.state)
@@ -107,7 +146,11 @@ func (fsm *AgentFSM) toDone() {
 	fsm.logState()
 }
 
-// ToDoneChan -
+/*
+ToDoneChan возвращает канал, по которому будет отправлен Ok{} когда агент перейдет в состояние Done.
+
+Переход в состояние Done происходит автоматически в тот момент, когда все агенты будут находиться в состоянии Idle.
+*/
 func (fsm *AgentFSM) ToDoneChan() chan Ok {
 	result := make(chan Ok)
 
@@ -120,7 +163,11 @@ func (fsm *AgentFSM) ToDoneChan() chan Ok {
 	return result
 }
 
-// SetStopFlag -
+/*
+SetStopFlag устанавливает значение stopFlag.
+
+Когда stopFlag всех агентов будет равен true - симуляция завершится по достижению конца тика.
+*/
 func (fsm *AgentFSM) SetStopFlag(value bool) {
 	fsm.stopFlagMutex.Lock()
 	if fsm.stopFlag != value {
