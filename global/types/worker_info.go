@@ -1,18 +1,18 @@
 package types
 
-// WorkerInfo - represents current worker status
+// WorkerInfo это описание известной информации о Worker'е.
 type WorkerInfo struct {
-	UID            string
-	Busy           bool
-	MFlops         MFlop
-	TotalDiskSpace MByte
-	FreeDiskSpace  MByte
-	PricePerTick   float64
-	Datasets       []string
-	Calculators    []string
-	ControlUnit    string
+	UID            string   // Уникальный идентификатор
+	Busy           bool     // Выполняет ли воркер в данный момент какую-либо задачу. В каждый момент времени воркер не должен выполнять более одной задачи
+	MFlops         MFlop    // Вычислительная мощность воркера в мегафлопсах
+	TotalDiskSpace MByte    // Доступное для изспользования Evergrid дисковое пространство
+	FreeDiskSpace  MByte    // Неиспользованное дисковое пространство, доступное для Evergrid
+	PricePerTick   float64  // Стоитмость одной минуты работы в условных единицах
+	Datasets       []string // Загруженные на воркер датасеты
+	Calculators    []string // Собранные на воркере вычислители
+	ControlUnit    string   // Идентификатор ControlUnit'а, который управляет воркером
 
-	QueueLength        int
-	DatasetsInQueue    []string
-	CalculatorsInQueue []string
+	QueueLength        int      // Количество задач, которые ждут начала выполнения на воркере
+	DatasetsInQueue    []string // Идентификаторы датасетов, которые будут загружены на воркер
+	CalculatorsInQueue []string // Идентификаторы вычислителей, которые буду собраны на воркере
 }

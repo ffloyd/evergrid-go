@@ -8,7 +8,6 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// simulationCmd represents the simulation command
 var gendataCmd = &cobra.Command{
 	Use:       "gendata NAME DESTDIR",
 	Aliases:   []string{"gen", "g"},
