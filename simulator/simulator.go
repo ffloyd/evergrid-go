@@ -1,3 +1,4 @@
+// Package simulator отвечает за запуск симуляции архитектуры Evergrid
 package simulator
 
 import (
@@ -13,7 +14,9 @@ import (
 	"github.com/ffloyd/evergrid-go/simulator/worker"
 )
 
-// Simulator -
+/*
+Simulator - это струтура содержащая всю информацию о симуляции.
+*/
 type Simulator struct {
 	simData *simdata.SimData
 
@@ -27,7 +30,7 @@ type Simulator struct {
 	cuWorkers map[string][]string
 }
 
-// New -
+// New - инициализация симуляции на основе корневого файла сценария.
 func New(simdataFilename string) *Simulator {
 	sim := &Simulator{
 		simData:   simdata.Load(simdataFilename),
@@ -63,7 +66,7 @@ func New(simdataFilename string) *Simulator {
 	return sim
 }
 
-// Run -
+// Run - запуск симуляции
 func (sim *Simulator) Run() {
 	sim.simenv.Run()
 }
