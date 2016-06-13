@@ -1,12 +1,17 @@
 package scheduler
 
-// Scheduler -
+/*
+Scheduler это интерфейс, который должен быть реализован любым планировщиком.
+
+Любое использование планировщика должно основываться на этом интерфейсе, а не
+работать с его структурой напрямую.
+*/
 type Scheduler interface {
-	Name() string
+	Name() string // Имя. По сути название алгоритма.
 
-	Run()
+	Run() // Вызов этой функции запускает работу планировщика
 
-	RequestChans() RequestChans
-	ControlChans() ControlChans
-	InfoChans() InfoChans
+	RequestChans() RequestChans // Каналы, по которым планировщик получает запросы
+	ControlChans() ControlChans // Каналы, по которым планировщик контроллирует внешнюю среду
+	InfoChans() InfoChans       // Каналы, по которым планировщик узнает о состоянии системы
 }

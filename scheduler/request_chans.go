@@ -2,14 +2,25 @@ package scheduler
 
 import "github.com/ffloyd/evergrid-go/global/types"
 
-// RequestChans -
+/*
+RequestChans - это каналы, по которым в планировщик приходят запросы.
+
+DelegateToLeader - это канал по которому планировщик говорит о том, что:
+
+  в случае отправки true - надо лелегировать этот запрос лидеру
+  в случае отправки false - что запрос принят и можно присылать следующий
+
+Данная группа каналов является "синхронной" - т. е. запросы в планировщик должны
+приходить последовательно.
+*/
 type RequestChans struct {
-	UploadDataset    chan ReqUploadDataset
-	RunExperiment    chan ReqRunExperiment
+	UploadDataset chan ReqUploadDataset
+	RunExperiment chan ReqRunExperiment
+
 	DelegateToLeader chan bool
 }
 
-// NewRequestChans -
+// NewRequestChans - инициализатор для RequestChans
 func NewRequestChans() RequestChans {
 	return RequestChans{
 		UploadDataset:    make(chan ReqUploadDataset),
@@ -18,12 +29,12 @@ func NewRequestChans() RequestChans {
 	}
 }
 
-// ReqUploadDataset -
+// ReqUploadDataset - запрос на загрузку датасета в систему.
 type ReqUploadDataset struct {
 	Dataset types.DatasetInfo
 }
 
-// ReqRunExperiment -
+// ReqRunExperiment - запрос на запуск вычислителя с данным датасетом.
 type ReqRunExperiment struct {
 	Calculator types.CalculatorInfo
 	Dataset    types.DatasetInfo

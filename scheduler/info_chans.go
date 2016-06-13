@@ -2,7 +2,20 @@ package scheduler
 
 import "github.com/ffloyd/evergrid-go/global/types"
 
-// InfoChans -
+/*
+InfoChans это каналы, по которым планировщик узнает о внешнем состоянии системы.
+
+Запрос происходит путем отправки сообщения. Используемые структуры содержат канал
+для получения ответа.
+
+Пример использования:
+
+	request := NewGetWorkerNames()
+	ic.WorkerNames <- request
+	names := <-request.Result
+
+Данные каналы могут использоваться асинхронно.
+*/
 type InfoChans struct {
 	WorkerNames      chan GetWorkerNames
 	WorkerInfo       chan GetWorkerInfo
@@ -11,7 +24,7 @@ type InfoChans struct {
 	LeadershipStatus chan GetLeadershipStatus
 }
 
-// NewInfoChans -
+// NewInfoChans - инициализатор для InfoChans
 func NewInfoChans() InfoChans {
 	return InfoChans{
 		WorkerNames:    make(chan GetWorkerNames),
@@ -23,30 +36,30 @@ func NewInfoChans() InfoChans {
 	}
 }
 
-// GetWorkerNames -
+// GetWorkerNames возвращает идентификаторы всех воркеров в системе.
 type GetWorkerNames struct {
 	Result chan []string
 }
 
-// GetWorkerInfo -
+// GetWorkerInfo возвращает актуальную информацию о воркере
 type GetWorkerInfo struct {
 	WorkerUID string
 	Result    chan *types.WorkerInfo
 }
 
-// GetDatasetInfo -
+// GetDatasetInfo возвращает актуальную информацию о датасете
 type GetDatasetInfo struct {
 	DatasetUID string
 	Result     chan *types.DatasetInfo
 }
 
-// GetCalculatorInfo -
+// GetCalculatorInfo возвращает актуальную информацию о вычислителе
 type GetCalculatorInfo struct {
 	CalculatorUID string
 	Result        chan *types.CalculatorInfo
 }
 
-// GetLeadershipStatus -
+// GetLeadershipStatus возврашает true если Control Unit, на котором находится scheduler является лидером.
 type GetLeadershipStatus struct {
 	Result chan bool
 }
@@ -55,14 +68,14 @@ type GetLeadershipStatus struct {
 // Initializers
 //
 
-// NewGetWorkerNames -
+// NewGetWorkerNames - функция для удобной инициализации структуры
 func NewGetWorkerNames() GetWorkerNames {
 	return GetWorkerNames{
 		Result: make(chan []string),
 	}
 }
 
-// NewGetWorkerInfo -
+// NewGetWorkerInfo - функция для удобной инициализации структуры
 func NewGetWorkerInfo(uid string) GetWorkerInfo {
 	return GetWorkerInfo{
 		WorkerUID: uid,
@@ -70,7 +83,7 @@ func NewGetWorkerInfo(uid string) GetWorkerInfo {
 	}
 }
 
-// NewGetDatasetInfo -
+// NewGetDatasetInfo - функция для удобной инициализации структуры
 func NewGetDatasetInfo(uid string) GetDatasetInfo {
 	return GetDatasetInfo{
 		DatasetUID: uid,
@@ -78,7 +91,7 @@ func NewGetDatasetInfo(uid string) GetDatasetInfo {
 	}
 }
 
-// NewGetCalculatorInfo -
+// NewGetCalculatorInfo - функция для удобной инициализации структуры
 func NewGetCalculatorInfo(uid string) GetCalculatorInfo {
 	return GetCalculatorInfo{
 		CalculatorUID: uid,
@@ -86,7 +99,7 @@ func NewGetCalculatorInfo(uid string) GetCalculatorInfo {
 	}
 }
 
-// NewGetLeadershipStatus -
+// NewGetLeadershipStatus - функция для удобной инициализации структуры
 func NewGetLeadershipStatus() GetLeadershipStatus {
 	return GetLeadershipStatus{
 		Result: make(chan bool),
