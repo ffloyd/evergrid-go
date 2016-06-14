@@ -64,6 +64,7 @@ func (up *uploader) Process() {
 	}
 
 	up.worker.stats.UploadingTicks++
+	up.worker.stats.MoneySpent += up.worker.pricePerTick
 
 	// 1 tick = 1 minute
 	mbytesDownloaded := types.MByte(up.speed * 60 / 8)

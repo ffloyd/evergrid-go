@@ -55,6 +55,7 @@ func (b *builder) Process() {
 	}
 
 	b.worker.stats.BuildingTicks++
+	b.worker.stats.MoneySpent += b.worker.pricePerTick
 
 	b.building = false
 	b.builtCalculators[b.calculator.UID] = b.calculator

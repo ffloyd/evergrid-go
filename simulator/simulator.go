@@ -28,6 +28,8 @@ type Simulator struct {
 
 	cuNames   []string
 	cuWorkers map[string][]string
+
+	workers []*worker.Worker
 }
 
 // New - инициализация симуляции на основе корневого файла сценария.
@@ -66,9 +68,10 @@ func New(simdataFilename string) *Simulator {
 	return sim
 }
 
-// Run - запуск симуляции
+// Run - запуск симуляции и вывод общей статистики
 func (sim *Simulator) Run() {
 	sim.simenv.Run()
+	worker.StatsReport(sim.workers, sim.logContext)
 }
 
 func (sim *Simulator) addAgent(cfg *networkcfg.AgentCfg) {
@@ -80,7 +83,9 @@ func (sim *Simulator) addAgent(cfg *networkcfg.AgentCfg) {
 	case networkcfg.AgentCore:
 		agent = core.New(*cfg, sim.simData.Workload.Requests, sim.cuNames, sim.logContext)
 	case networkcfg.AgentWorker:
-		agent = worker.New(*cfg, sim.logContext)
+		worker := worker.New(*cfg, sim.logContext)
+		sim.workers = append(sim.workers, worker)
+		agent = worker
 	}
 
 	sim.simenv.Add(agent)

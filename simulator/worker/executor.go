@@ -56,6 +56,7 @@ func (ex *executor) Process() {
 	}
 
 	ex.worker.stats.CalculatingTicks++
+	ex.worker.stats.MoneySpent += ex.worker.pricePerTick
 
 	ex.mflopsDone += ex.worker.performance * 60
 	totalMFlops := ex.calculator.MFlopsPerMb * types.MFlop(ex.dataset.Size)
