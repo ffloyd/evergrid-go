@@ -1,6 +1,6 @@
 package network
 
-// Agent interface defines methods which essential for agent persistance in Node struct
+// Agent - в рамках данного пакета нас итересуют только имена агентов
 type Agent interface {
 	Name() string
 }
