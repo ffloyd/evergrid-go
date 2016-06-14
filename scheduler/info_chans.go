@@ -36,6 +36,41 @@ func NewInfoChans() InfoChans {
 	}
 }
 
+// GetWorkerNames реализует соответствующий запрос с блокировкой до получения результата
+func (ic InfoChans) GetWorkerNames() []string {
+	request := NewGetWorkerNames()
+	ic.WorkerNames <- request
+	return <-request.Result
+}
+
+// GetWorkerInfo реализует соответствующий запрос с блокировкой до получения результата
+func (ic InfoChans) GetWorkerInfo(uid string) types.WorkerInfo {
+	request := NewGetWorkerInfo(uid)
+	ic.WorkerInfo <- request
+	return *(<-request.Result)
+}
+
+// GetDatasetInfo реализует соответствующий запрос с блокировкой до получения результата
+func (ic InfoChans) GetDatasetInfo(uid string) types.DatasetInfo {
+	request := NewGetDatasetInfo(uid)
+	ic.DatasetInfo <- request
+	return *(<-request.Result)
+}
+
+// GetCalculatorInfo реализует соответствующий запрос с блокировкой до получения результата
+func (ic InfoChans) GetCalculatorInfo(uid string) types.CalculatorInfo {
+	request := NewGetCalculatorInfo(uid)
+	ic.CalculatorInfo <- request
+	return *(<-request.Result)
+}
+
+// GetLeadershipStatus реализует соответствующий запрос с блокировкой до получения результата
+func (ic *InfoChans) GetLeadershipStatus() bool {
+	request := NewGetLeadershipStatus()
+	ic.LeadershipStatus <- request
+	return <-request.Result
+}
+
 // GetWorkerNames возвращает идентификаторы всех воркеров в системе.
 type GetWorkerNames struct {
 	Result chan []string

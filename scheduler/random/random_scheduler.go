@@ -1,3 +1,4 @@
+// Package random содержит тривиальную реализацию планировщика, который распределеяет нагрузку в случайном порядке
 package random
 
 import (
@@ -8,7 +9,13 @@ import (
 	"github.com/ffloyd/evergrid-go/scheduler"
 )
 
-// Scheduler -
+/*
+Scheduler - это тривиальная реализация планировщика.
+
+При запросе на загрузку датасета выбирается один случайный воркер и датасет загружается на него.
+
+При запросе на выполнение эксперимента - эксперимент запускается на воркере, с уже загруженным датасетом.
+*/
 type Scheduler struct {
 	infoChans    scheduler.InfoChans
 	requestChans scheduler.RequestChans
@@ -17,7 +24,7 @@ type Scheduler struct {
 	log *logrus.Entry
 }
 
-// NewScheduler -
+// NewScheduler - реализация планировщика, который распределеяет нагрузку в случайном порядке
 func NewScheduler(logContext *logrus.Entry) *Scheduler {
 	return &Scheduler{
 		infoChans:    scheduler.NewInfoChans(),
@@ -28,27 +35,29 @@ func NewScheduler(logContext *logrus.Entry) *Scheduler {
 	}
 }
 
-// Name -
+// Name возвращает назавние планировщика: Random Scheduler
 func (s *Scheduler) Name() string {
 	return "Random Scheduler"
 }
 
-// Run -
+/*
+Run запускает планировщик.
+*/
 func (s *Scheduler) Run() {
 	go s.work()
 }
 
-// RequestChans -
+// RequestChans - каналы для запросов к планировщику
 func (s *Scheduler) RequestChans() scheduler.RequestChans {
 	return s.requestChans
 }
 
-// ControlChans -
+// ControlChans - каналы управления для планировщика
 func (s *Scheduler) ControlChans() scheduler.ControlChans {
 	return s.controlChans
 }
 
-// InfoChans -
+// InfoChans - каналы мониторинга для планировщика
 func (s *Scheduler) InfoChans() scheduler.InfoChans {
 	return s.infoChans
 }
@@ -84,20 +93,10 @@ func (s *Scheduler) leadershipStatus() bool {
 }
 
 func (s *Scheduler) getRandomWorker() types.WorkerInfo {
-	getNames := scheduler.NewGetWorkerNames()
-	s.infoChans.WorkerNames <- getNames
-	names := <-getNames.Result
+	names := s.InfoChans().GetWorkerNames()
 
 	randomName := names[rand.Intn(len(names))]
-	getWorker := scheduler.NewGetWorkerInfo(randomName)
-	s.infoChans.WorkerInfo <- getWorker
-	return *<-getWorker.Result
-}
-
-func (s *Scheduler) getDatasetInfo(datasetName string) types.DatasetInfo {
-	getDataset := scheduler.NewGetDatasetInfo(datasetName)
-	s.infoChans.DatasetInfo <- getDataset
-	return *<-getDataset.Result
+	return s.InfoChans().GetWorkerInfo(randomName)
 }
 
 func (s *Scheduler) processUploadDataset(request scheduler.ReqUploadDataset) {
@@ -115,7 +114,7 @@ func (s *Scheduler) processUploadDataset(request scheduler.ReqUploadDataset) {
 }
 
 func (s *Scheduler) processRunExperiment(request scheduler.ReqRunExperiment) {
-	dataset := s.getDatasetInfo(request.Dataset.UID)
+	dataset := s.InfoChans().GetDatasetInfo(request.Dataset.UID)
 	worker := append(dataset.Workers, dataset.EnqueuedOnWorkers...)[0]
 
 	s.controlChans.BuildCalculator <- scheduler.DoBuildCalculator{
