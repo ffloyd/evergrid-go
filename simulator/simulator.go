@@ -2,9 +2,13 @@
 package simulator
 
 import (
+	"os"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/ffloyd/evergrid-go/scheduler"
 	"github.com/ffloyd/evergrid-go/scheduler/naivecheap"
+	"github.com/ffloyd/evergrid-go/scheduler/naivefast"
+	"github.com/ffloyd/evergrid-go/scheduler/random"
 	"github.com/ffloyd/evergrid-go/simenv"
 	"github.com/ffloyd/evergrid-go/simulator/controlunit"
 	"github.com/ffloyd/evergrid-go/simulator/core"
@@ -18,6 +22,8 @@ import (
 Simulator - это струтура содержащая всю информацию о симуляции.
 */
 type Simulator struct {
+	schedulerName string
+
 	simData *simdata.SimData
 
 	network *network.Network
@@ -33,14 +39,26 @@ type Simulator struct {
 }
 
 // New - инициализация симуляции на основе корневого файла сценария.
-func New(simdataFilename string) *Simulator {
+func New(simdataFilename string, schedulerName string, jsonLog string) *Simulator {
+	if jsonLog != "" {
+		filename := jsonLog
+		logrus.SetFormatter(&logrus.JSONFormatter{})
+		f, err := os.OpenFile(filename, os.O_CREATE|os.O_RDWR, os.ModePerm)
+		if err != nil {
+			panic(err)
+		}
+		logrus.SetOutput(f)
+	}
+
 	sim := &Simulator{
-		simData:   simdata.Load(simdataFilename),
-		simenv:    simenv.New(),
-		cuWorkers: make(map[string][]string),
+		schedulerName: schedulerName,
+		simData:       simdata.Load(simdataFilename),
+		simenv:        simenv.New(),
+		cuWorkers:     make(map[string][]string),
 	}
 
 	sim.logContext = logrus.WithField("simulation", sim.simData.Name)
+
 	sim.network = network.New(sim.simData.Network)
 	sim.sharedData = controlunit.NewSharedData()
 
@@ -92,5 +110,14 @@ func (sim *Simulator) addAgent(cfg *networkcfg.AgentCfg) {
 }
 
 func (sim *Simulator) genScheduler(logContext *logrus.Entry) scheduler.Scheduler {
-	return naivecheap.NewScheduler(logContext)
+	switch sim.schedulerName {
+	case "random":
+		return random.NewScheduler(logContext)
+	case "naivefast":
+		return naivefast.NewScheduler(logContext)
+	case "naivecheap":
+		return naivecheap.NewScheduler(logContext)
+	default:
+		panic("Unknown scheduler type")
+	}
 }
