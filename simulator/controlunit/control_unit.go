@@ -71,7 +71,7 @@ func (cu *ControlUnit) Run(env *simenv.SimEnv) simenv.AgentChans {
 
 	cu.scheduler = cu.schedGen(cu.log.WithField("context", "scheduler"))
 
-	cu.localQueue = newLocalQueue(cu)
+	cu.localQueue = *newLocalQueue(cu)
 	cu.monitor = newMonitor(cu)
 
 	// Leader election

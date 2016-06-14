@@ -1,6 +1,8 @@
 package controlunit
 
 import (
+	"sync"
+
 	"github.com/Sirupsen/logrus"
 	"github.com/ffloyd/evergrid-go/global/types"
 	"github.com/ffloyd/evergrid-go/scheduler"
@@ -11,16 +13,18 @@ type localQueue struct {
 	cu *ControlUnit
 
 	queues map[string][]interface{}
+	mutex  sync.Mutex
 }
 
-func newLocalQueue(cu *ControlUnit) localQueue {
-	return localQueue{
+func newLocalQueue(cu *ControlUnit) *localQueue {
+	return &localQueue{
 		cu:     cu,
 		queues: make(map[string][]interface{}),
 	}
 }
 
 func (lq *localQueue) Push(task interface{}) {
+	lq.mutex.Lock()
 	var workerName string
 	sd := lq.cu.sharedData
 	sd.Mutex.Lock()
@@ -63,9 +67,11 @@ func (lq *localQueue) Push(task interface{}) {
 
 	sd.Mutex.Unlock()
 	lq.queues[workerName] = append(lq.queues[workerName], task)
+	lq.mutex.Unlock()
 }
 
 func (lq *localQueue) Process() {
+	lq.mutex.Lock()
 	lq.updateWorkersInfo()
 
 	sd := lq.cu.sharedData
@@ -124,13 +130,16 @@ func (lq *localQueue) Process() {
 			})
 		}
 	}
+	lq.mutex.Unlock()
 }
 
 func (lq *localQueue) Empty() bool {
+	lq.mutex.Lock()
 	sum := 0
 	for _, arr := range lq.queues {
 		sum += len(arr)
 	}
+	lq.mutex.Unlock()
 	return sum == 0
 }
 

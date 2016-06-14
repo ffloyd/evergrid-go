@@ -67,7 +67,7 @@ func (s *Scheduler) work() {
 	for {
 		select {
 		case request := <-chans.UploadDataset:
-			if s.leadershipStatus() {
+			if s.infoChans.GetLeadershipStatus() {
 				s.processUploadDataset(request)
 				chans.DelegateToLeader <- false
 			} else {
@@ -75,7 +75,7 @@ func (s *Scheduler) work() {
 			}
 
 		case request := <-chans.RunExperiment:
-			if s.leadershipStatus() {
+			if s.infoChans.GetLeadershipStatus() {
 				s.processRunExperiment(request)
 				chans.DelegateToLeader <- false
 			} else {
@@ -84,12 +84,6 @@ func (s *Scheduler) work() {
 
 		}
 	}
-}
-
-func (s *Scheduler) leadershipStatus() bool {
-	req := scheduler.NewGetLeadershipStatus()
-	s.infoChans.LeadershipStatus <- req
-	return <-req.Result
 }
 
 func (s *Scheduler) getRandomWorker() types.WorkerInfo {

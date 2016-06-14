@@ -4,7 +4,7 @@ package simulator
 import (
 	"github.com/Sirupsen/logrus"
 	"github.com/ffloyd/evergrid-go/scheduler"
-	"github.com/ffloyd/evergrid-go/scheduler/random"
+	"github.com/ffloyd/evergrid-go/scheduler/naivefast"
 	"github.com/ffloyd/evergrid-go/simenv"
 	"github.com/ffloyd/evergrid-go/simulator/controlunit"
 	"github.com/ffloyd/evergrid-go/simulator/core"
@@ -92,5 +92,5 @@ func (sim *Simulator) addAgent(cfg *networkcfg.AgentCfg) {
 }
 
 func (sim *Simulator) genScheduler(logContext *logrus.Entry) scheduler.Scheduler {
-	return random.NewScheduler(logContext)
+	return naivefast.NewScheduler(logContext)
 }

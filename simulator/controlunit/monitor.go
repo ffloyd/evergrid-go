@@ -35,6 +35,7 @@ func (mon *monitor) work() {
 }
 
 func (mon *monitor) processWorkerNames(request scheduler.GetWorkerNames) {
+	mon.cu.sharedData.Mutex.Lock()
 	names := make([]string, len(mon.cu.sharedData.Workers))
 
 	i := 0
@@ -42,22 +43,31 @@ func (mon *monitor) processWorkerNames(request scheduler.GetWorkerNames) {
 		names[i] = name
 		i++
 	}
+	mon.cu.sharedData.Mutex.Unlock()
 
 	request.Result <- names
 }
 
 func (mon *monitor) processWorkerInfo(request scheduler.GetWorkerInfo) {
+	mon.cu.sharedData.Mutex.Lock()
 	request.Result <- mon.cu.sharedData.Workers[request.WorkerUID]
+	mon.cu.sharedData.Mutex.Unlock()
 }
 
 func (mon *monitor) processDatasetInfo(request scheduler.GetDatasetInfo) {
+	mon.cu.sharedData.Mutex.Lock()
 	request.Result <- mon.cu.sharedData.Datasets[request.DatasetUID]
+	mon.cu.sharedData.Mutex.Unlock()
 }
 
 func (mon *monitor) processCalculatorInfo(request scheduler.GetCalculatorInfo) {
+	mon.cu.sharedData.Mutex.Lock()
 	request.Result <- mon.cu.sharedData.Calculators[request.CalculatorUID]
+	mon.cu.sharedData.Mutex.Unlock()
 }
 
 func (mon *monitor) processLeadershipStatus(request scheduler.GetLeadershipStatus) {
+	mon.cu.sharedData.Mutex.Lock()
 	request.Result <- (mon.cu.sharedData.LeaderControlUnit.Name() == mon.cu.Name())
+	mon.cu.sharedData.Mutex.Unlock()
 }
